@@ -1,0 +1,24 @@
+{
+  "name": "hero-experience",
+  "version": "1.0.0",
+  "description": "interactive user experience for hero image displays",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rollup -c rollup.config.js --compact"
+  },
+  "keywords": [
+    "hero",
+    "experience"
+  ],
+  "author": "gregclark2k11@gmail.com",
+  "license": "ISC",
+  "dependencies": {
+    "snabby": "^4.2.1"
+  },
+  "devDependencies": {
+    "rollup": "^2.44.0",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-url-resolve": "^0.1.1"
+  }
+}
