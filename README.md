@@ -31,16 +31,19 @@ function createMyHero (selector, position) {
 				
 				height: 100%;
 				width: 100%;
-				height: inherit;
-				width: inherit;
+				/*height: inherit;*/
+				/*width: inherit;*/
 				
-				z-index: 20001;
+				z-index: 20012;
 			}
 		</style>
 		<my-hero-experience 
 			class="my-hero-parent" 
 			productid="123"
-			fullscreenPosition="fixed">
+			fullscreenPosition="fixed"
+			fullscreenZindex="20012"
+			canExpandHeight="true"
+			canExpandWidth="true">
 		</my-hero-experience>`
 		
 		if (target) {

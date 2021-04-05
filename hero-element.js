@@ -76,19 +76,33 @@
             const myHero = this._getMyHero(configs.productid);
             const model = {
                 productid: configs.productid,
+                fullscreenPosition: '',
+                canExpandWidth: false,
+                canExpandHeight: false,
                 
             };
 
             if (myHero) {
+                // reset normal view styles
                 model.resetStyles = {
                     position: myHero.style.position,
                     width: myHero.style.width,
                     height: myHero.style.height,
                     top: myHero.style.top,
-                    left: myHero.style.left
+                    left: myHero.style.left,
+                    'z-index': myHero.style['z-index']
                 };
 
+                // myHero.style['min-width'] =  model.resetStyles.width;
+                // myHero.style['min-height'] =  model.resetStyles.height;
+
                 model.fullscreenPosition = myHero.getAttribute('fullscreenPosition');
+                model.fullscreenZindex = myHero.getAttribute('fullscreenZindex');
+                model.canExpandHeight = myHero.getAttribute('canExpandHeight');
+                model.canExpandWidth = myHero.getAttribute('canExpandWidth');
+               
+                myHero.style['overflow-y'] = model.canExpandHeight ? 'visible' : 'auto';
+                myHero.style['overflow-x'] = model.canExpandWidth ? 'visible' : 'auto';
 
             }
             return  model;
@@ -106,6 +120,8 @@
     
                     border: solid black 2px;
                     width: calc(100% - 2px);
+                    min-width: calc(100% - 2px);
+                    height: calc(100% - 2px);
                     min-height: calc(100% - 2px);
     
                     z-index: 5;
@@ -115,15 +131,30 @@
                     width: 40px;
                     height: 40px;
                     background-color: blue;
+                    cursor: pointer;
                 }
                 .my-custom-element--item-view {
                     position: absolute;
                     top: 64px;
                     width: 99%;
+                    min-width: 99%;
                     height: 99%;
+                    min-height: 99%;
                     background: white;
-    
-                    transition: height 0.2s ease, width 0.2s ease;
+                    
+                    overflow: scroll;
+                }
+                .my-custom-element--item-view-expands-height-width {
+                    transition: height 0.5s ease, width 0.7s ease;
+                    overflow: visible;
+                }
+                .my-custom-element--item-view-expands-width {
+                    transition: width 0.7s ease;
+                    overflow-x: visible;
+                }
+                .my-custom-element--item-view-expands-height {
+                    transition: height 0.5s ease;
+                    overflow-y: visible;
                 }
                 .my-custom-element--item-view-fullscreen {
                     position: absolute;
@@ -132,6 +163,7 @@
                     width: 100%;
                     height: 100%;
                     background: white;
+                    overflow: auto;
                 }
     
                 .my-custom-element-col-2 {
@@ -145,6 +177,9 @@
                     display: grid;
                     justify-content: end;
                     justify-self: end;
+                   /*margin-right: 0px;*/
+
+                   cursor: pointer;
                 }
                 .my-custom-element--bottom-left {
                     display: grid;
@@ -155,11 +190,13 @@
                     justify-content: end;
                     justify-self: end;
                     align-self: end;
+                    /*margin-right: 0px;*/
                 }
                 .my-custom-element--center {
                     display: grid;
                     justify-items: center;
                     align-self: center;
+                    
                 }
     
                 .my-ribbon {
@@ -173,6 +210,7 @@
                     height: 64px;
                     background-color: green;
                     position: absolute;
+                    cursor: pointer;
                 }
 
                 .my-ribbon-items {
@@ -180,7 +218,8 @@
                     width: 0px;
                     transition: width 0.2s ease;
                     position: absolute;
-                    background-color: white;
+                    background-color: grey;
+                    
                 }
     
             `;
@@ -255,16 +294,29 @@
             const _renderItem = () => {
                 // would take this._model.displayItem and its data to display
                 // look up and instantiate
-    
-                return html`<div class="my-custom-element--item-view${this._model.isFullscreen ? '-fullscreen' : ''}">
+                /**
+                 *   @style:width"${!this._model.isFullscreen && this._model.canExpandWidth ? 'auto' : '' }"
+                    @style:height"${!this._model.isFullscreen && this._model.canExpandHeight ? 'auto' : '' }"
+                 */
+                let transitionClass = ' my-custom-element--item-view-expands-';
+                transitionClass += this._model.canExpandWidth && this._model.canExpandHeight ? 'height-width' : this._model.canExpandHeight ? 'height' : this._model.canExpandWidth ? 'width' : 'false';
+                return html`<div class="my-custom-element--item-view${this._model.isFullscreen ? '-fullscreen' : ''}${transitionClass}"
+                    @style:width="${!this._model.isFullscreen && this._model.canExpandWidth ? 'auto' : '' }"
+                    @style:height="${!this._model.isFullscreen && this._model.canExpandHeight ? 'auto' : '' }">
+
                     <div class="my-custom-element-col-2">
                         <div class="my-custom-element--top-left my-custom-element--item">Top Left</div>
                         <div class="my-custom-element--top-right my-custom-element--item"
                         @on:click="${_toggleItemFullScreen}">fullscreen</div>
                     </div>
     
-                    <div class="my-custom-element--center">
-                        <div class="my-custom-element--center my-custom-element--item">
+                    <div class="my-custom-element--center"
+
+                    >
+                        <div class="my-custom-element--center my-custom-element--item"
+                        
+                            @style:height="1000px"
+                            @style:width="1000px">
                             ${this._model.displayItem}-Center-${this._model.displayItem}
                         </div>
                     </div>
