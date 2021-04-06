@@ -20,7 +20,7 @@
         }
 
         _getMyHero (id) {
-            return document.querySelector(`my-hero-experience[productid="${id || this._model.productid}"]`);
+            return document.querySelector(`my-hero-experience[product-id="${id || this._model.productid}"]`);
         }
     
         _update () {
