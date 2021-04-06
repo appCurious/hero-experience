@@ -1,6 +1,21 @@
 # Prototyping Custom Hero Image Element
-A custom element for use with a sites hero image which allows user interaction to display more information
+A custom element for use with a site's hero image which allows user interaction to display more information.  Concept allows for working with a custom element where the styling and control is given to the website owner.  This prototyping process helps to discover element attributes that empower the owner to control the custom element AND allows the developer to work within the custom element to discover the proper attributes necessary to function effectively.
 
+## Custom Element Attributes
+```
+	string: productid="123"
+	string: fullscreenPosition="fixed" 	(expects css value)
+	string: fullscreenZindex="20012"	(expects css value)
+	string: canExpandHeight="true"		(used as boolean)
+	string: canExpandWidth="true"		(used as boolean)
+```
+
+## What It Does
+*  Allows an icon to be positioned over a hero image that can be interacted with to display a ribbon with more options
+*  Ribbon display slides out to present more interactable items
+*  Interactable Items are clickable and present more information or more details over the hero image
+*  More details can be clicked to go fullscreen and take over the entire window view
+*  Original style values are preserved and restored after fullscreen view is returned to normal viewing mode
 ## Manual Site Testing ( on an existing site already hosted )
 It's a way to see what the custom element would look like on someone's existing site
 Use the script and text below to create the html entities necessary for the component to display

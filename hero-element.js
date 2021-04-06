@@ -131,7 +131,6 @@
                     width: 40px;
                     height: 40px;
                     background-color: blue;
-                    cursor: pointer;
                 }
                 .my-custom-element--item-view {
                     position: absolute;
@@ -220,6 +219,9 @@
                     position: absolute;
                     background-color: grey;
                     
+                }
+                .my-ribbon-items .my-custom-element--item {
+                    cursor: pointer;
                 }
     
             `;
