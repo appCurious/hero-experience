@@ -23,7 +23,8 @@ Use the script and text below to create the html entities necessary for the comp
 ### When you are able to supply a target element selector
 *  copy the function and paste it into the console
 *  update the parameters to target an existing element on the page
-*  then paste the hero-element.js file contents into the script tag that was created
+*  script src points to the hero-element.js file
+*  (local developemnt point it to your local host)
 
 
 ```
@@ -33,6 +34,7 @@ function createMyHero (selector, position) {
 	const s = document.createElement('script');
 	s.id="my-hero-element-script";
 	s.type="module";
+	s.src = "https://cdn.jsdelivr.net/gh/appCurious/hero-experience/hero-element.js";
 	hed.append(s);
 	
 	if (selector && position) {
@@ -76,7 +78,6 @@ createMyHero('#realHeroContainer','afterbegin');
 * edit an existing element as html and paste where the custom element is to display
 * copy the function and paste it to the console
 * run the script with no parameters
-* then paste the hero-element.js file contents into the script tag that was created
 
 ```
 createMyHero();
