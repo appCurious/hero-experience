@@ -39,8 +39,8 @@
         attributeChangedCallback (name, oldValue, newValue) {
             console.log('attribute changed ', name, oldValue, ' new value ', newValue);
     
-            if (name === 'productid') {
-                console.log('would we change hero data for productid ', newValue);
+            if (name === 'product-id') {
+                console.log('would we change hero data for product-id ', newValue);
                 this._model = this._init({productid: newValue});
 
                 // this._model.productid = newValue;
@@ -55,14 +55,14 @@
                 //     }
                 // }
                 
-            } else if (name === 'ecjson') { // there really is no else, on instantiation all the attributes are registered as changed - listen for the one that matters and update all?
+            } else if (name === 'ec-json') { // there really is no else, on instantiation all the attributes are registered as changed - listen for the one that matters and update all?
                 // call for data and async await
             } 
     
             this._update();
         }
     
-        static get observedAttributes () { return [ 'productid', 'ecjson', 'tagName' ]; }
+        static get observedAttributes () { return [ 'product-id', 'ec-json' ]; }
     
         static registerCustomModule () { window.customElements.define('my-hero-experience', MyHeroExperience); }
     
@@ -96,10 +96,12 @@
                 // myHero.style['min-width'] =  model.resetStyles.width;
                 // myHero.style['min-height'] =  model.resetStyles.height;
 
-                model.fullscreenPosition = myHero.getAttribute('fullscreenPosition');
-                model.fullscreenZindex = myHero.getAttribute('fullscreenZindex');
-                model.canExpandHeight = myHero.getAttribute('canExpandHeight');
-                model.canExpandWidth = myHero.getAttribute('canExpandWidth');
+                model.fullscreenPosition = myHero.getAttribute('fullscreen-position');
+                model.fullscreenZindex = myHero.getAttribute('fullscreen-zindex');
+                model.canExpandHeight = myHero.getAttribute('can-expand-height');
+                model.canExpandWidth = myHero.getAttribute('can-expand-width');
+
+                model.heroReferenceSelector = myHero.getAttribute('hero-reference-selector');
                
                 myHero.style['overflow-y'] = model.canExpandHeight ? 'visible' : 'auto';
                 myHero.style['overflow-x'] = model.canExpandWidth ? 'visible' : 'auto';

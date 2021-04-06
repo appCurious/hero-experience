@@ -3,11 +3,13 @@ A custom element for use with a site's hero image which allows user interaction 
 
 ## Custom Element Attributes
 ```
-	string: productid="123"
-	string: fullscreenPosition="fixed" 	(expects css value)
-	string: fullscreenZindex="20012"	(expects css value)
-	string: canExpandHeight="true"		(used as boolean)
-	string: canExpandWidth="true"		(used as boolean)
+	string: product-id="123"
+	string: fullscreen-position="fixed" 	(expects css value)
+	string: fullscreen-zindex="20012"	(expects css value)
+	string: can-expand-height="true"		(used as boolean)
+	string: can-expand-width="true"		(used as boolean)
+	url:	ec-json="https://myurl.wherever"
+	string: hero-reference-selector="#element-selector" (expects a javascript query selector)
 ```
 
 ## What It Does
@@ -56,11 +58,12 @@ function createMyHero (selector, position) {
 		</style>
 		<my-hero-experience 
 			class="my-hero-parent" 
-			productid="123"
-			fullscreenPosition="fixed"
-			fullscreenZindex="20012"
-			canExpandHeight="true"
-			canExpandWidth="true">
+			product-id="123"
+			fullscreen-position="fixed"
+			fullscreen-zindex="20012"
+			can-expand-height="true"
+			can-expand-width="true"
+			hero-reference-selector="">
 		</my-hero-experience>`
 		
 		if (target) {
