@@ -77,8 +77,10 @@
             const model = {
                 productid: configs.productid,
                 fullscreenPosition: '',
+                fullscreenZindex: '',
                 canExpandWidth: false,
                 canExpandHeight: false,
+                heroReferenceSelector: ''
                 
             };
 

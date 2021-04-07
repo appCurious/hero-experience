@@ -36,7 +36,8 @@ function createMyHero (selector, position) {
 	const s = document.createElement('script');
 	s.id="my-hero-element-script";
 	s.type="module";
-	s.src = "https://cdn.jsdelivr.net/gh/appCurious/hero-experience/hero-element.js";
+	//s.src = "https://cdn.jsdelivr.net/gh/appCurious/hero-experience/hero-element.js";
+	s.src = "https://localhost:50021/my-hero";
 	hed.append(s);
 	
 	if (selector && position) {
@@ -84,4 +85,18 @@ createMyHero('#realHeroContainer','afterbegin');
 
 ```
 createMyHero();
+```
+
+### Serve From Localhost
+* create certs ( on windows use wls or git bash )
+* remember to open the browser and request https://localhost:50021/my-hero in order to allow the self-signed cert
+
+```
+openssl genrsa -out server.key
+openssl req -new -key server.key -out server.cert
+openssl x509 -req -days 9999 -in server.cert -signkey server.key -out server.cert.pem
+rm server.cert
+```
+```
+node server
 ```
