@@ -115,6 +115,7 @@
                     // for accuracy place an observer here for resize or reposition
                     model.parentResizeObserver = new ResizeObserver( (entries) => {
                         const rect = heroReference.getClientRects()[0];
+                        // const rect = heroReference.getBoundingClientRect();
                         // const rect = entries[0].contentRect;
                         const calcStyle = getComputedStyle(heroReference);
                         console.log('the rect ', rect, ' calculated top and left ', calcStyle.top, calcStyle.left)
