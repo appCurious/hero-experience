@@ -108,7 +108,61 @@
                 myHero.style['overflow-y'] = model.canExpandHeight ? 'visible' : 'auto';
                 myHero.style['overflow-x'] = model.canExpandWidth ? 'visible' : 'auto';
 
+                const heroReference = model.heroReferenceSelector ? document.querySelector(model.heroReferenceSelector) : null;
+                if (heroReference) {
+                    console.log('we got heroReference ', heroReference)
+                    // we are positioning the hero element over the parent
+                    // for accuracy place an observer here for resize or reposition
+                    model.parentResizeObserver = new ResizeObserver( (entries) => {
+                        const rect = heroReference.getClientRects()[0];
+                        // const rect = entries[0].contentRect;
+                        const calcStyle = getComputedStyle(heroReference);
+                        console.log('the rect ', rect, ' calculated top and left ', calcStyle.top, calcStyle.left)
+                        myHero.style.position = 'absolute';
+                        myHero.style.top = `${rect.x}px`;
+                        myHero.style.left = `${rect.left}px`;
+                        myHero.style.width = `${rect.width}px`;
+                        myHero.style['max-width'] = `${rect.width}px`;
+                        myHero.style.height = `${rect.height}px`;
+                        myHero.style['max-height'] = `${rect.height}px`;
+                        myHero.style['z-index'] = model.fullscreenZindex;
+
+                        // record reset styles to apply after fullscreen
+                        model.resetStyles = {
+                            position: myHero.style.position,
+
+                            width: myHero.style.width,
+                            'max-width':  myHero.style['max-width'],
+
+                            height: myHero.style.height,
+                            'max-height': myHero.style['max-height'],
+                            
+                            top: myHero.style.top,
+                            left: myHero.style.left,
+                            'z-index': myHero.style['z-index']
+                        };
+
+                    });
+
+                    // should really watch other elements to see position change - smaller window | mobile
+                    // model.parentResizeObserver.observe(heroReference);
+                    model.parentResizeObserver.observe(myHero.parentElement);
+
+
+                    // const rect = heroReference.getClientRects()[0];
+                    // console.log('the rect ', rect)
+                    // myHero.style.position = 'absolute';
+                    // myHero.style.top = `${rect.x}px`;
+                    // myHero.style.left = `${rect.left}px`;
+                    // myHero.style.width = `${rect.width}px`;
+                    // myHero.style['max-width'] = `${rect.width}px`;
+                    // myHero.style.height = `${rect.height}px`;
+                    // myHero.style['max-height'] = `${rect.height}px`;
+                    // myHero.style['z-index'] = model.fullscreenZindex;
+                }
+
             }
+
             return  model;
         }
     
@@ -369,6 +423,8 @@
                     myHero.style.position = this._model.fullscreenPosition; //'absolute';
                     myHero.style.width = '100%';
                     myHero.style.height = '100%';
+                    myHero.style['max-width'] = '100%',
+                    myHero.style['max-height'] = '100%',
                     myHero.style.top = '0';
                     myHero.style.left = '0';
                 } else {
