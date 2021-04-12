@@ -18,6 +18,31 @@ A custom element for use with a site's hero image which allows user interaction 
 *  Interactable Items are clickable and present more information or more details over the hero image
 *  More details can be clicked to go fullscreen and take over the entire window view
 *  Original style values are preserved and restored after fullscreen view is returned to normal viewing mode
+
+## Implementation
+As a website administrator you have the control over when to display this element and where to display it.  With a few configurations and a little coordination with your development team, you can implement this customization
+
+### Implementation Option - Avoid Elements with Transitions and Overflow Hidden
+Use this method when your site and hero elements hide overflow content ( css overflow: hidden )
+* Place the custom element tag in the body of site page
+* Set the hero-reference-selector to be the element to have the overlay content
+* Set the ec-json="https://myurl.wherever" to retreive the overlay content
+
+### Implementation Option - Nested Within Hero Elements
+Use this method when your site and hero elements do not hide overflow content content ( css overflow: auto | scroll )
+* Place the custom element tag within the hero element that will display the overlay content
+* Set the ec-json="https://myurl.wherever" to retreive the overlay content
+
+### Implementation Option - Mobile / Responsive
+If you are using the same page for mobile presentation and you hide, remove or utilize another element for the hero display
+* Use a custom element for each display
+* Be sure to remove and hide each experience 
+* Be sure to use a custom element for each experience
+* Be sure each element is configured according to the desired approach
+* Set the ec-json="https://myurl.wherever" to retreive the overlay content
+
+
+
 ## Manual Site Testing ( on an existing site already hosted )
 It's a way to see what the custom element would look like on someone's existing site
 Use the script and text below to create the html entities necessary for the component to display

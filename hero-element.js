@@ -1,8 +1,8 @@
 
 
-    // import html from 'snabby';
-    import html from 'https://cdn.skypack.dev/snabby?min';
-  
+// import html from 'snabby';
+import html from 'https://cdn.skypack.dev/snabby?min';
+
     // possibly extract out reusable code to a base element MyBaseElement extends HTMLElement
     // attaching shadow dom might be good candidate for base element
     export default class MyHeroExperience extends HTMLElement {
@@ -42,33 +42,105 @@
             if (name === 'product-id') {
                 console.log('would we change hero data for product-id ', newValue);
                 this._model = this._init({productid: newValue});
-
-                // this._model.productid = newValue;
-                // const myHero = this._getMyHero();
-                // if (myHero) {
-                //     this._model.resetStyles = {
-                //         position: myHero.style.position,
-                //         width: myHero.style.width,
-                //         height: myHero.style.height,
-                //         top: myHero.style.top,
-                //         left: myHero.style.left
-                //     }
-                // }
                 
-            } else if (name === 'ec-json') { // there really is no else, on instantiation all the attributes are registered as changed - listen for the one that matters and update all?
-                // call for data and async await
             } 
+            if (name === 'ec-json') { // there really is no else, on instantiation all the attributes are registered as changed - listen for the one that matters and update all?
+                // call for data and async await
+            }
+            if (name === 'hero-reference-selector') {
+                console.log('hero reference changed from ', oldValue, ' to --> ', newValue);
+                // adjust hero reference and sizing and observer - but not on initialize
+                if (this._model) {
+                    if (this._model.heroReferenceSelector !== newValue) {
+                         this._setupHeroReference(this._model, newValue);
+                    }
+                }
+               
+            }
     
             this._update();
         }
     
-        static get observedAttributes () { return [ 'product-id', 'ec-json' ]; }
+        static get observedAttributes () { return [ 'product-id', 'ec-json', 'hero-reference-selector' ]; }
     
         static registerCustomModule () { window.customElements.define('my-hero-experience', MyHeroExperience); }
     
+        _setupHeroReference(model, heroReferenceSelector) {
+            // destroy one if it exists
+            if (model.parentResizeObserver) {
+                model.parentResizeObserver.unobserve(document.querySelector(model.heroReferenceSelector).parentElement);
+                model.parentResizeObserver.disconnect();
+                model.parentResizeObserver = null;
+            }
+            if (model.heroReferenceResizeObserver) {
+                model.heroReferenceResizeObserver.unobserve(document.querySelector(model.heroReferenceSelector));
+                model.heroReferenceResizeObserver.disconnect();
+                model.heroReferenceResizeObserver = null;
+            }
+            const myHero = this._getMyHero(model.productid);
+             // need to destroy the existing observer if there is one - before setting this
+             model.heroReferenceSelector = heroReferenceSelector;
+             const heroReference = model.heroReferenceSelector ? document.querySelector(model.heroReferenceSelector) : null;
+
+            const _updateHeroSizing = () => {
+                // working to get the correct positioning
+                // getClientRects()[0] was closest to position
+                // tried to get parent and scroll parent,
+                //  also experimented with popper.js utilities to see if they would help solve overlay
+                // adjusting for visualView port was a solution
+                // continue to experiment on sites to see what happens
+                const rect = heroReference.getClientRects()[0];
+                rect.y += visualViewport.pageTop;
+
+                // working to position custom element over the hero
+
+                myHero.style.position = 'absolute';
+                myHero.style.top = `${rect.y}px`;
+                myHero.style.left = `${rect.left}px`;
+                myHero.style.width = `${rect.width}px`;
+                myHero.style['max-width'] = `${rect.width}px`;
+                myHero.style.height = `${rect.height}px`;
+                myHero.style['max-height'] = `${rect.height}px`;
+                myHero.style['z-index'] = model.fullscreenZindex;
+
+                // record reset styles to apply after fullscreen
+                model.resetStyles = {
+                    position: myHero.style.position,
+
+                    width: myHero.style.width,
+                    'max-width':  myHero.style['max-width'],
+
+                    height: myHero.style.height,
+                    'max-height': myHero.style['max-height'],
+                    
+                    top: myHero.style.top,
+                    left: myHero.style.left,
+                    'z-index': myHero.style['z-index']
+                };
+             };
+             if (heroReference) {
+                 console.log('we got heroReference ', heroReference)
+                 // was trying to place a div in the custom element and move it around, but that's not quite working
+                 // const heroWrapper = document.createElement('div');
+                 // heroWrapper.id = 'my-custom-element';
+                 // myHero.append(heroWrapper);
+
+                 // we are positioning the hero element over the parent
+                 // for accuracy place an observer here for resize or reposition
+                model.heroReferenceResizeObserver = new ResizeObserver( (entries) => {  _updateHeroSizing(); });
+                model.parentResizeObserver = new ResizeObserver( (entries) => {  _updateHeroSizing(); });
+
+
+                 // should experiment and watch other elements to see position change - smaller window | mobile
+                 // model.parentResizeObserver.observe(heroReference);
+                 // model.parentResizeObserver.observe(myHero.parentElement);
+                 model.heroReferenceResizeObserver.observe(heroReference);
+                 model.parentResizeObserver.observe(heroReference.parentElement);                   
+             }
+        }
     
         _init (configs) {
-            console.log('initialized');
+            console.log('initialized', configs);
             // initialize ribbon or hotspots or modal
             // would return that model instead
             // return experience.init(configs);
@@ -80,7 +152,8 @@
                 fullscreenZindex: '',
                 canExpandWidth: false,
                 canExpandHeight: false,
-                heroReferenceSelector: ''
+                heroReferenceSelector: '',
+                parentResizeObserver: undefined,
                 
             };
 
@@ -103,64 +176,75 @@
                 model.canExpandHeight = myHero.getAttribute('can-expand-height');
                 model.canExpandWidth = myHero.getAttribute('can-expand-width');
 
-                model.heroReferenceSelector = myHero.getAttribute('hero-reference-selector');
+                // // need to destroy the existing observer if there is one
+                // moving this to setupHeroSelector
+                // model.heroReferenceSelector = myHero.getAttribute('hero-reference-selector');
                
                 myHero.style['overflow-y'] = model.canExpandHeight ? 'visible' : 'auto';
                 myHero.style['overflow-x'] = model.canExpandWidth ? 'visible' : 'auto';
 
-                const heroReference = model.heroReferenceSelector ? document.querySelector(model.heroReferenceSelector) : null;
-                if (heroReference) {
-                    console.log('we got heroReference ', heroReference)
-                    // we are positioning the hero element over the parent
-                    // for accuracy place an observer here for resize or reposition
-                    model.parentResizeObserver = new ResizeObserver( (entries) => {
-                        const rect = heroReference.getClientRects()[0];
-                        // const rect = heroReference.getBoundingClientRect();
-                        // const rect = entries[0].contentRect;
-                        const calcStyle = getComputedStyle(heroReference);
-                        console.log('the rect ', rect, ' calculated top and left ', calcStyle.top, calcStyle.left)
-                        myHero.style.position = 'absolute';
-                        myHero.style.top = `${rect.x}px`;
-                        myHero.style.left = `${rect.left}px`;
-                        myHero.style.width = `${rect.width}px`;
-                        myHero.style['max-width'] = `${rect.width}px`;
-                        myHero.style.height = `${rect.height}px`;
-                        myHero.style['max-height'] = `${rect.height}px`;
-                        myHero.style['z-index'] = model.fullscreenZindex;
+                this._setupHeroReference( model,  myHero.getAttribute('hero-reference-selector') );
 
-                        // record reset styles to apply after fullscreen
-                        model.resetStyles = {
-                            position: myHero.style.position,
+                // // need to destroy the existing observer if there is one
+                // model.heroReferenceSelector = myHero.getAttribute('hero-reference-selector');
+                // const heroReference = model.heroReferenceSelector ? document.querySelector(model.heroReferenceSelector) : null;
+                // if (heroReference) {
+                //     console.log('we got heroReference ', heroReference)
+                //     // was trying to place a div in the custom element and move it around, but that's not quite working
+                //     // const heroWrapper = document.createElement('div');
+                //     // heroWrapper.id = 'my-custom-element';
+                //     // myHero.append(heroWrapper);
 
-                            width: myHero.style.width,
-                            'max-width':  myHero.style['max-width'],
+                //     // we are positioning the hero element over the parent
+                //     // for accuracy place an observer here for resize or reposition
+                //     // destroy one if it exists
+                //     if (model.parentResizeObserver) {
+                //         model.parentResizeObserver.unobserve(parentResizeObserver.get);
+                //         model.parentResizeObserver.disconnect();
+                //     }
+                //     model.parentResizeObserver = new ResizeObserver( (entries) => {
+                //         // working to get the correct positioning
+                //         // getClientRects()[0] was closest to position
+                //         // tried to get parent and scroll parent,
+                //         //  also experimented with popper.js utilities to see if they would help solve overlay
+                //         // adjusting for visualView port was a solution
+                //         // continue to experiment on sites to see what happens
+                //         const rect = heroReference.getClientRects()[0];
+                //         rect.y += visualViewport.pageTop;
 
-                            height: myHero.style.height,
-                            'max-height': myHero.style['max-height'],
+                //         // working to position custom element over the hero
+
+                //         myHero.style.position = 'absolute';
+                //         myHero.style.top = `${rect.y}px`;
+                //         myHero.style.left = `${rect.left}px`;
+                //         myHero.style.width = `${rect.width}px`;
+                //         myHero.style['max-width'] = `${rect.width}px`;
+                //         myHero.style.height = `${rect.height}px`;
+                //         myHero.style['max-height'] = `${rect.height}px`;
+                //         myHero.style['z-index'] = model.fullscreenZindex;
+
+                //         // record reset styles to apply after fullscreen
+                //         model.resetStyles = {
+                //             position: myHero.style.position,
+
+                //             width: myHero.style.width,
+                //             'max-width':  myHero.style['max-width'],
+
+                //             height: myHero.style.height,
+                //             'max-height': myHero.style['max-height'],
                             
-                            top: myHero.style.top,
-                            left: myHero.style.left,
-                            'z-index': myHero.style['z-index']
-                        };
+                //             top: myHero.style.top,
+                //             left: myHero.style.left,
+                //             'z-index': myHero.style['z-index']
+                //         };
 
-                    });
+                //     });
 
-                    // should really watch other elements to see position change - smaller window | mobile
-                    // model.parentResizeObserver.observe(heroReference);
-                    model.parentResizeObserver.observe(myHero.parentElement);
-
-
-                    // const rect = heroReference.getClientRects()[0];
-                    // console.log('the rect ', rect)
-                    // myHero.style.position = 'absolute';
-                    // myHero.style.top = `${rect.x}px`;
-                    // myHero.style.left = `${rect.left}px`;
-                    // myHero.style.width = `${rect.width}px`;
-                    // myHero.style['max-width'] = `${rect.width}px`;
-                    // myHero.style.height = `${rect.height}px`;
-                    // myHero.style['max-height'] = `${rect.height}px`;
-                    // myHero.style['z-index'] = model.fullscreenZindex;
-                }
+                //     // should experiment and watch other elements to see position change - smaller window | mobile
+                //     // model.parentResizeObserver.observe(heroReference);
+                //     // model.parentResizeObserver.observe(myHero.parentElement);
+                //     model.parentResizeObserver.observe(heroReference.parentElement);                   
+                // }
 
             }
 

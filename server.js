@@ -14,9 +14,12 @@ app.get('/my-hero', function (req, res) {
 	res.sendFile(__dirname + '/hero-element.js');
 });
 
+app.get('/src/*', function (req, res) {
+	res.sendFile(__dirname + req._parsedUrl.path);
+});
+
 
 // const server = app.listen(50021, function () {
-	
 // 	console.log('running on 50021');
 // });
 
