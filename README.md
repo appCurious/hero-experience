@@ -22,16 +22,19 @@ A custom element for use with a site's hero image which allows user interaction 
 ## Implementation
 As a website administrator you have the control over when to display this element and where to display it.  With a few configurations and a little coordination with your development team, you can implement this customization
 
-### Implementation Option - Avoid Elements with Transitions and Overflow Hidden
+### Implementation Option - Independent Overlay - Avoid Elements with Transitions and Overflow Hidden
 Use this method when your site and hero elements hide overflow content ( css overflow: hidden )
 * Place the custom element tag in the body of site page
 * Set the hero-reference-selector to be the element to have the overlay content
 * Set the ec-json="https://myurl.wherever" to retreive the overlay content
 
-### Implementation Option - Nested Within Hero Elements
+### Implementation Option - Child Element - Nested Within Hero Elements
 Use this method when your site and hero elements do not hide overflow content content ( css overflow: auto | scroll )
 * Place the custom element tag within the hero element that will display the overlay content
 * Set the ec-json="https://myurl.wherever" to retreive the overlay content
+
+### Implementation Option - Parent Element - Hero Elements Nested Within Overlay Element
+- Currently investigating this method using slots - https://developers.google.com/web/fundamentals/web-components/shadowdom#slots
 
 ### Implementation Option - Mobile / Responsive
 If you are using the same page for mobile presentation and you hide, remove or utilize another element for the hero display
