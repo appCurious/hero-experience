@@ -7,7 +7,7 @@ Listen for custom events as users interact with the Custom Hero Element
 * 
 ## Custom Element Attributes
 ```
-	string: product-id="123"
+	string: product-id="prod123"	( technically a string starts with chars https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/id )
 	string: fullscreen-position="fixed" 	(expects css value)
 	string: fullscreen-zindex="20012"	(expects css value)
 	string: can-expand-height="true"		(used as boolean)

@@ -19,29 +19,26 @@ import html from 'https://cdn.skypack.dev/snabby?min';
     
         }
 
-        _getMyHero (id) {
-            return document.querySelector(`my-hero-experience[product-id="${id || this._model.productid}"]`);
-        }
-    
-        _update () {
-            const newVnode = this._view(this._model, () => this._update());
-            this.currentVnode = html.update(this.currentVnode, newVnode);
-        }
-    
+        // public properties
+
+        // private properties
+        #_model = undefined;
+
+        // public methods first
         connectedCallback () {
             console.log('we are connected');
             // TODO in the event we need my data - we may not have it passed into the constructor
             // maybe a function on my.getHeroData or something used by the init function would work
-            // this._model = this._init(this._model);
-            // this._update();
+            // this.#_model = this.#_init(this.#_model);
+            // this.#_update();
         }
-    
+        
         attributeChangedCallback (name, oldValue, newValue) {
             console.log('attribute changed ', name, oldValue, ' new value ', newValue);
     
             if (name === 'product-id') {
                 console.log('would we change hero data for product-id ', newValue);
-                this._model = this._init({productid: newValue});
+                this.#_model = this.#_init({productid: newValue});
                 
             } 
             if (name === 'ec-json') { // there really is no else, on instantiation all the attributes are registered as changed - listen for the one that matters and update all?
@@ -50,22 +47,33 @@ import html from 'https://cdn.skypack.dev/snabby?min';
             if (name === 'hero-reference-selector') {
                 console.log('hero reference changed from ', oldValue, ' to --> ', newValue);
                 // adjust hero reference and sizing and observer - but not on initialize
-                if (this._model) {
-                    if (this._model.heroReferenceSelector !== newValue) {
-                         this._setupHeroReference(this._model, newValue);
+                if (this.#_model) {
+                    if (this.#_model.heroReferenceSelector !== newValue) {
+                         this.#_setupHeroReference(this.#_model, newValue);
                     }
                 }
                
             }
     
-            this._update();
+            this.#_update();
         }
     
         static get observedAttributes () { return [ 'product-id', 'ec-json', 'hero-reference-selector' ]; }
     
         static registerCustomModule () { window.customElements.define('my-hero-experience', MyHeroExperience); }
+
+
+        // private methods after public methods
+        #_getMyHero (id) {
+            return document.querySelector(`my-hero-experience[product-id="${id || this.#_model.productid}"]`);
+        }
     
-        _setupHeroReference(model, heroReferenceSelector) {
+        #_update () {
+            const newVnode = this.#_view(this.#_model, () => this.#_update());
+            this.currentVnode = html.update(this.currentVnode, newVnode);
+        }
+    
+        #_setupHeroReference(model, heroReferenceSelector) {
             // destroy one if it exists
             if (model.parentResizeObserver) {
                 model.parentResizeObserver.unobserve(document.querySelector(model.heroReferenceSelector).parentElement);
@@ -77,7 +85,7 @@ import html from 'https://cdn.skypack.dev/snabby?min';
                 model.heroReferenceResizeObserver.disconnect();
                 model.heroReferenceResizeObserver = null;
             }
-            const myHero = this._getMyHero(model.productid);
+            const myHero = this.#_getMyHero(model.productid);
              // need to destroy the existing observer if there is one - before setting this
              model.heroReferenceSelector = heroReferenceSelector;
              const heroReference = model.heroReferenceSelector ? document.querySelector(model.heroReferenceSelector) : null;
@@ -139,13 +147,13 @@ import html from 'https://cdn.skypack.dev/snabby?min';
              }
         }
     
-        _init (configs) {
+        #_init (configs) {
             console.log('initialized', configs);
             // initialize ribbon or hotspots or modal
             // would return that model instead
             // return experience.init(configs);
 
-            const myHero = this._getMyHero(configs.productid);
+            const myHero = this.#_getMyHero(configs.productid);
             const model = {
                 productid: configs.productid,
                 fullscreenPosition: '',
@@ -179,17 +187,17 @@ import html from 'https://cdn.skypack.dev/snabby?min';
                 myHero.style['overflow-y'] = model.canExpandHeight ? 'visible' : 'auto';
                 myHero.style['overflow-x'] = model.canExpandWidth ? 'visible' : 'auto';
 
-                this._setupHeroReference( model,  myHero.getAttribute('hero-reference-selector') );
+                this.#_setupHeroReference( model,  myHero.getAttribute('hero-reference-selector') );
 
             }
 
             return  model;
         }
     
-        _view (model) {
+        #_view (model) {
             console.log('view called');
             // might do some logic in the init function or attributeChanged to discover which experience ribbon, hotspots, modal
-            // return experience.view(this._model, this._update);
+            // return experience.view(this.#_model, this._update);
             const style = `
                 :host {
                     display: block;
@@ -321,8 +329,8 @@ import html from 'https://cdn.skypack.dev/snabby?min';
             const leftHidden = '-200px';
             
 
-            this._model.items = [{widgetId:1},{widgetId:2},{widgetId:3}];
-            const itemsWidth = `${this._model.items.length * 50}px`;// '150px';
+            this.#_model.items = [{widgetId:1},{widgetId:2},{widgetId:3}];
+            const itemsWidth = `${this.#_model.items.length * 50}px`;// '150px';
 
      
             const _createRibbonItems = () => {
@@ -334,7 +342,7 @@ import html from 'https://cdn.skypack.dev/snabby?min';
                 // <div class="my-custom-element--item" 
                 // @on:click="${() => _displayItem(3)}"></div>
 
-                return this._model.items.map((item) => {
+                return this.#_model.items.map((item) => {
                     return html`<div class="my-custom-element--item"
                         @on:click="${() => _displayItem(item.widgetId)}">
                     </div>`;
@@ -343,61 +351,61 @@ import html from 'https://cdn.skypack.dev/snabby?min';
     
             const _toggleRibbon = () => {
                 console.log('my toggle')
-                this._model.ribbonVisible = !this._model.ribbonVisible;
+                this.#_model.ribbonVisible = !this.#_model.ribbonVisible;
 
                 // bubble toggle event
                 const icon = this.shadowRoot.querySelector('.my-ribbon-icon');
                 // testing the difference between composed true | false
                 // icon.dispatchEvent(new Event('toggle-ribbon-display', {bubbles: true, composed: false}));
                 // icon.dispatchEvent(new Event('toggle-ribbon-display', {bubbles: true, composed: true}));
-                const eventDetail = `ribbon items are ${ this._model.ribbonVisible ? 'viewing' : 'hidding'}`;
+                const eventDetail = `ribbon items are ${ this.#_model.ribbonVisible ? 'viewing' : 'hidding'}`;
                 icon.dispatchEvent(new CustomEvent('toggle-ribbon-display', { bubbles: true, composed: true, detail: eventDetail }));
-                if (!this._model.ribbonVisible) return _closeItem();
+                if (!this.#_model.ribbonVisible) return _closeItem();
 
-                this._update();
+                this.#_update();
             };
     
             const _displayItem = (itemId) => {
                 // we would go get the model item and corresponding widget display
                 // but here we are going to take up the space given to us
                 console.log('my display item')
-                if (itemId === this._model.displayItem) {
+                if (itemId === this.#_model.displayItem) {
                     return _closeItem();
                 }
 
                 _closeItem();
-                this._model.displayItem = itemId;
-                this._update();
+                this.#_model.displayItem = itemId;
+                this.#_update();
     
             };
     
             const _toggleItemFullScreen = () => {
-                this._model.isFullscreen = !this._model.isFullscreen;
-                this._viewFullScreen();
+                this.#_model.isFullscreen = !this.#_model.isFullscreen;
+                this.#_viewFullScreen();
 
-                this._update();
+                this.#_update();
             };
     
             const _closeItem = () => {
-                // report if you will this._model.displayItem
-                this._model.displayItem = null;
-                this._update();
+                // report if you will this.#_model.displayItem
+                this.#_model.displayItem = null;
+                this.#_update();
             };
     
     
     
             const _renderItem = () => {
-                // would take this._model.displayItem and its data to display
+                // would take this.#_model.displayItem and its data to display
                 // look up and instantiate
                 /**
-                 *   @style:width"${!this._model.isFullscreen && this._model.canExpandWidth ? 'auto' : '' }"
-                    @style:height"${!this._model.isFullscreen && this._model.canExpandHeight ? 'auto' : '' }"
+                 *   @style:width"${!this.#_model.isFullscreen && this.#_model.canExpandWidth ? 'auto' : '' }"
+                    @style:height"${!this.#_model.isFullscreen && this.#_model.canExpandHeight ? 'auto' : '' }"
                  */
                 let transitionClass = ' my-custom-element--item-view-expands-';
-                transitionClass += this._model.canExpandWidth && this._model.canExpandHeight ? 'height-width' : this._model.canExpandHeight ? 'height' : this._model.canExpandWidth ? 'width' : 'false';
-                return html`<div id="my-custom-element-4567896878787" @key="my-custom-element-4567896878787" class="my-custom-element--item-view${this._model.isFullscreen ? ' fullscreen' : ''}${transitionClass}"
-                    @style:width="${!this._model.isFullscreen && this._model.canExpandWidth ? 'auto' : '100%'}"
-                    @style:height="${!this._model.isFullscreen && this._model.canExpandHeight ? 'auto' : '100%' }"
+                transitionClass += this.#_model.canExpandWidth && this.#_model.canExpandHeight ? 'height-width' : this.#_model.canExpandHeight ? 'height' : this.#_model.canExpandWidth ? 'width' : 'false';
+                return html`<div id="my-custom-element-4567896878787" @key="my-custom-element-4567896878787" class="my-custom-element--item-view${this.#_model.isFullscreen ? ' fullscreen' : ''}${transitionClass}"
+                    @style:width="${!this.#_model.isFullscreen && this.#_model.canExpandWidth ? 'auto' : '100%'}"
+                    @style:height="${!this.#_model.isFullscreen && this.#_model.canExpandHeight ? 'auto' : '100%' }"
                     @style:transition="height 1.5s ease, width 1.7s ease;">
 
                     <div class="my-custom-element-col-2">
@@ -413,7 +421,7 @@ import html from 'https://cdn.skypack.dev/snabby?min';
                         
                             @style:height="1000px"
                             @style:width="1000px">
-                            ${this._model.displayItem}-Center-${this._model.displayItem}
+                            ${this.#_model.displayItem}-Center-${this.#_model.displayItem}
                         </div>
                     </div>
                     <div class="my-custom-element-col-2">
@@ -432,32 +440,32 @@ import html from 'https://cdn.skypack.dev/snabby?min';
                     <style>${style}</style>
                     <slot id="my-custom-element-slot-hero" name="my-hero-container-top"></slot>
                     <div class="my-ribbon"
-                        @style:width="${this._model.ribbonVisible ? itemsWidth : collapsedWidth}">
+                        @style:width="${this.#_model.ribbonVisible ? itemsWidth : collapsedWidth}">
                         <div class="my-ribbon-icon"
                             @on:click="${_toggleRibbon}">
                            
                         </div>
                         
                         <div class="my-ribbon-items"
-                            @style:left="${this._model.ribbonVisible ? leftDisplay : leftHidden }"
-                            @style:width="${this._model.ribbonVisible ? itemsWidth : '0px'}">
+                            @style:left="${this.#_model.ribbonVisible ? leftDisplay : leftHidden }"
+                            @style:width="${this.#_model.ribbonVisible ? itemsWidth : '0px'}">
 
                             ${_createRibbonItems()}
                         </div>
                     
                         
                     </div>
-                    ${this._model.displayItem ? _renderItem() : ''}
+                    ${this.#_model.displayItem ? _renderItem() : ''}
                 </div>
             `;
         }
 
-        _viewFullScreen () {
-            const myHero = this._getMyHero();
+        #_viewFullScreen () {
+            const myHero = this.#_getMyHero();
 
             if (myHero) {
-                if ( this._model.isFullscreen) {
-                    myHero.style.position = this._model.fullscreenPosition; //'absolute';
+                if ( this.#_model.isFullscreen) {
+                    myHero.style.position = this.#_model.fullscreenPosition; //'absolute';
                     myHero.style.width = '100%';
                     myHero.style.height = '100%';
                     myHero.style['max-width'] = '100%',
@@ -465,27 +473,27 @@ import html from 'https://cdn.skypack.dev/snabby?min';
                     myHero.style.top = '0';
                     myHero.style.left = '0';
                 } else {
-                    Object.keys(this._model.resetStyles).forEach((s) => {
-                        myHero.style[s] = this._model.resetStyles[s];
+                    Object.keys(this.#_model.resetStyles).forEach((s) => {
+                        myHero.style[s] = this.#_model.resetStyles[s];
                     });
                 }
                 
             }
         }
     
-        _destroy () {
-            this._model = null;
+        #_destroy () {
+            this.#_model = null;
         }
     }
     
     window.customElements.define('my-hero-experience', MyHeroExperience);
 
-    function confirmScriptMyHero () {
-        console.log('we got confirmation');
+    // function confirmScriptMyHero () {
+    //     console.log('we got confirmation');
 
-		return html`<div>Yes WE Got It</div>`
+	// 	return html`<div>Yes WE Got It</div>`
         
-	}
+	// }
 
-    confirmScriptMyHero();
+    // confirmScriptMyHero();
     
