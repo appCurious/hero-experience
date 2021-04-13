@@ -191,6 +191,13 @@ import html from 'https://cdn.skypack.dev/snabby?min';
             // might do some logic in the init function or attributeChanged to discover which experience ribbon, hotspots, modal
             // return experience.view(this._model, this._update);
             const style = `
+                :host {
+                    display: block;
+                }
+                :host ([hidden]) {
+                    display: none;
+                }
+
                 .my-custom-element {
                     display: grid;
                     color: red;
@@ -222,7 +229,8 @@ import html from 'https://cdn.skypack.dev/snabby?min';
                     overflow: scroll;
                 }
                 .my-custom-element--item-view-expands-height-width {
-                    transition: height 0.5s ease, width 0.7s ease;
+                   /* transition: height 0.5s ease, width 0.7s ease;*/
+                   transition: height 1.5s ease, width 1.7s ease;
                     overflow: visible;
                 }
                 .my-custom-element--item-view-expands-width {
@@ -233,12 +241,12 @@ import html from 'https://cdn.skypack.dev/snabby?min';
                     transition: height 0.5s ease;
                     overflow-y: visible;
                 }
-                .my-custom-element--item-view-fullscreen {
+                .my-custom-element--item-view .fullscreen {
                     position: absolute;
                     top: 0;
                     left: 0;
-                    width: 100%;
-                    height: 100%;
+                   /* width: 100%;*/
+                   /* height: 100%;*/
                     background: white;
                     overflow: auto;
                 }
@@ -337,6 +345,13 @@ import html from 'https://cdn.skypack.dev/snabby?min';
                 console.log('my toggle')
                 this._model.ribbonVisible = !this._model.ribbonVisible;
 
+                // bubble toggle event
+                const icon = this.shadowRoot.querySelector('.my-ribbon-icon');
+                // testing the difference between composed true | false
+                // icon.dispatchEvent(new Event('toggle-ribbon-display', {bubbles: true, composed: false}));
+                // icon.dispatchEvent(new Event('toggle-ribbon-display', {bubbles: true, composed: true}));
+                const eventDetail = `ribbon items are ${ this._model.ribbonVisible ? 'viewing' : 'hidding'}`;
+                icon.dispatchEvent(new CustomEvent('toggle-ribbon-display', { bubbles: true, composed: true, detail: eventDetail }));
                 if (!this._model.ribbonVisible) return _closeItem();
 
                 this._update();
@@ -380,9 +395,10 @@ import html from 'https://cdn.skypack.dev/snabby?min';
                  */
                 let transitionClass = ' my-custom-element--item-view-expands-';
                 transitionClass += this._model.canExpandWidth && this._model.canExpandHeight ? 'height-width' : this._model.canExpandHeight ? 'height' : this._model.canExpandWidth ? 'width' : 'false';
-                return html`<div class="my-custom-element--item-view${this._model.isFullscreen ? '-fullscreen' : ''}${transitionClass}"
-                    @style:width="${!this._model.isFullscreen && this._model.canExpandWidth ? 'auto' : '' }"
-                    @style:height="${!this._model.isFullscreen && this._model.canExpandHeight ? 'auto' : '' }">
+                return html`<div id="my-custom-element-4567896878787" @key="my-custom-element-4567896878787" class="my-custom-element--item-view${this._model.isFullscreen ? ' fullscreen' : ''}${transitionClass}"
+                    @style:width="${!this._model.isFullscreen && this._model.canExpandWidth ? 'auto' : '100%'}"
+                    @style:height="${!this._model.isFullscreen && this._model.canExpandHeight ? 'auto' : '100%' }"
+                    @style:transition="height 1.5s ease, width 1.7s ease;">
 
                     <div class="my-custom-element-col-2">
                         <div class="my-custom-element--top-left my-custom-element--item">Top Left</div>
@@ -414,6 +430,7 @@ import html from 'https://cdn.skypack.dev/snabby?min';
             return html `
                 <div class="my-custom-element">
                     <style>${style}</style>
+                    <slot id="my-custom-element-slot-hero" name="my-hero-container-top"></slot>
                     <div class="my-ribbon"
                         @style:width="${this._model.ribbonVisible ? itemsWidth : collapsedWidth}">
                         <div class="my-ribbon-icon"
