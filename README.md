@@ -1,6 +1,10 @@
 # Prototyping Custom Hero Image Element
 A custom element for use with a site's hero image which allows user interaction to display more information.  Concept allows for working with a custom element where the styling and control is given to the website owner.  This prototyping process helps to discover element attributes that empower the owner to control the custom element AND allows the developer to work within the custom element to discover the proper attributes necessary to function effectively.
 
+## Event API
+Listen for custom events as users interact with the Custom Hero Element
+* toggle-ribbon-display
+* 
 ## Custom Element Attributes
 ```
 	string: product-id="123"
