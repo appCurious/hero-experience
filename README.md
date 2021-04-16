@@ -7,10 +7,13 @@ Listen for custom events as users interact with the Custom Hero Element
 event with details indicating if the ribbon items are present or hidden 
 
 ## API
-### dynamicallyChangeSelectors() 
-creates a MutationObserver that observers document.body which will compare the hero-reference-selectors and switch to the active hero element
-### resetExperience() 
+### changeExperienceSelectors()
 each time it is called it will compare the hero-reference-selectors and switch to the active hero element
+### dynamicallyChangeSelectors() 
+creates a MutationObserver that observers document.body and will call changeExperienceSelectors() when mutations are detected
+### resetExperience(productid) 
+will set the productid and read all element properties in order to initialize again. same as changing the product-id attribute
+
 
 ## Custom Element Attributes
 ```
@@ -24,7 +27,7 @@ each time it is called it will compare the hero-reference-selectors and switch t
 	string: dynamically-change-selectors="true" (used as truthy comparison)
 ```
 ### product-id
-the sku or unique identifier for this product or page as indexed in our system.  this id is used for reporting and data retrieval
+the sku or unique identifier for this product or page as indexed in our system.  this id is used for reporting and data retrieval.  setting the product-id attribute will read all custom attributes and initialize the display.
 ### ec-json
 the url called to retrieve data as it is defined in our system according to your configurations
 ### hero-reference-selectors

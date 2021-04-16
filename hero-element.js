@@ -3,6 +3,8 @@
 // import html from 'snabby';
 import html from 'https://cdn.skypack.dev/snabby?min';
 
+    const _delimiter = ';';
+
     // possibly extract out reusable code to a base element MyBaseElement extends HTMLElement
     // attaching shadow dom might be good candidate for base element
     export default class MyHeroExperience extends HTMLElement {
@@ -28,20 +30,27 @@ import html from 'https://cdn.skypack.dev/snabby?min';
 
         // public methods first
         
-        resetExperience () {
+        resetExperience (productid) {
+            this.#_model = this.#_init({productid: productid || ''});
+        }
+
+        changeExperienceSelectors () {
+            console.log('called change experience selectors')
             if (this.#_model) {
-                this.#_model = this.#_init({productid: this.#_model.productid});
+                this.#_setupHeroReference(this.#_model);
             }
         }
 
         dynamicallyChangeSelectors () {
+            console.log('setup dynamic selectors')
             if (!this.#_documentMutationObserver) {
+
                 this.#_documentMutationObserver = new MutationObserver((record,observer) => {
                     console.log('doc was mutated');
-                    if (this.#_model) {
-                        this.#_model = this.#_init({productid: this.#_model.productid});
-                    }
+                    this.changeExperienceSelectors();
                 });
+
+                this.#_documentMutationObserver.observe(document.body, { childList: true, subtree: true } );
             }
         }
 
@@ -81,20 +90,22 @@ import html from 'https://cdn.skypack.dev/snabby?min';
             this.currentVnode = html.update(this.currentVnode, newVnode);
         }
     
-        #_setupHeroReference(model, heroReferenceSelector) {
+        #_setupHeroReference(model, heroReferenceSelectors) {
 
             const myHero = this.#_getMyHero(model.productid);
             if (!myHero) return console.log('no hero in setupHeroReference');
 
-            model.heroReferenceSelectors = heroReferenceSelectors;
-            model.heroReferenceSelectorArray = heroReferenceSelector.split(';');
+            model.heroReferenceSelectors = heroReferenceSelectors ? heroReferenceSelectors : model.heroReferenceSelectors ? model.heroReferenceSelectors : '';
+            model.heroReferenceSelectorArray = model.heroReferenceSelectors.split(_delimiter);
 
             console.log('what are my selectors ', model.heroReferenceSelectorArray)
 
             const _updateHeroSizing = (selector) => {
                 const heroReference = document.querySelector(selector);
                 if (!heroReference) {
-                    this.#_model = this.#_init(this.#_model);
+                    // this.#_model = this.#_init(this.#_model);
+                    // this.#_setupHeroReference(this.#_model.heroReferenceSelectors);
+                    this.#_setupHeroReference(this.#_model);
                     
                     return;
                 }
@@ -110,7 +121,9 @@ import html from 'https://cdn.skypack.dev/snabby?min';
                 // the other targets may have been removed replaced in the dom
                 // start again
                 if (!rect) {
-                    this.#_model = this.#_init(this.#_model);
+                    // this.#_model = this.#_init(this.#_model);
+                    // this.#_setupHeroReference(this.#_model.heroReferenceSelectors);
+                    this.#_setupHeroReference(this.#_model);
                     
                     return;
                 }
@@ -204,8 +217,7 @@ import html from 'https://cdn.skypack.dev/snabby?min';
                 canExpandWidth: false,
                 canExpandHeight: false,
                 heroReferenceSelectors: '',
-                heroReferenceSelectorArray: [],
-                parentResizeObserver: undefined,
+                heroReferenceSelectorArray: []
                 
             };
 
@@ -219,9 +231,6 @@ import html from 'https://cdn.skypack.dev/snabby?min';
                     left: myHero.style.left,
                     'z-index': myHero.style['z-index']
                 };
-
-                // myHero.style['min-width'] =  model.resetStyles.width;
-                // myHero.style['min-height'] =  model.resetStyles.height;
 
                 model.fullscreenPosition = myHero.getAttribute('fullscreen-position');
                 model.fullscreenZindex = myHero.getAttribute('fullscreen-zindex');
@@ -382,13 +391,6 @@ import html from 'https://cdn.skypack.dev/snabby?min';
 
      
             const _createRibbonItems = () => {
-                // return widget items
-                // <div class="my-custom-element--item"
-                // @on:click="${() => _displayItem(1)}"></div>
-                // <div class="my-custom-element--item"
-                // @on:click="${() => _displayItem(2)}"></div>
-                // <div class="my-custom-element--item" 
-                // @on:click="${() => _displayItem(3)}"></div>
 
                 return this.#_model.items.map((item) => {
                     return html`<div class="my-custom-element--item"
@@ -445,10 +447,7 @@ import html from 'https://cdn.skypack.dev/snabby?min';
             const _renderItem = () => {
                 // would take this.#_model.displayItem and its data to display
                 // look up and instantiate
-                /**
-                 *   @style:width"${!this.#_model.isFullscreen && this.#_model.canExpandWidth ? 'auto' : '' }"
-                    @style:height"${!this.#_model.isFullscreen && this.#_model.canExpandHeight ? 'auto' : '' }"
-                 */
+                
                 let transitionClass = ' my-custom-element--item-view-expands-';
                 transitionClass += this.#_model.canExpandWidth && this.#_model.canExpandHeight ? 'height-width' : this.#_model.canExpandHeight ? 'height' : this.#_model.canExpandWidth ? 'width' : 'false';
                 return html`<div id="my-custom-element-4567896878787" @key="my-custom-element-4567896878787" class="my-custom-element--item-view${this.#_model.isFullscreen ? ' fullscreen' : ''}${transitionClass}"
@@ -535,13 +534,3 @@ import html from 'https://cdn.skypack.dev/snabby?min';
     }
     
     window.customElements.define('my-hero-experience', MyHeroExperience);
-
-    // function confirmScriptMyHero () {
-    //     console.log('we got confirmation');
-
-	// 	return html`<div>Yes WE Got It</div>`
-        
-	// }
-
-    // confirmScriptMyHero();
-    
