@@ -13,6 +13,7 @@
   ],
   "author": "gregclark2k11@gmail.com",
   "license": "ISC",
+  "private": true,
   "dependencies": {
     "snabby": "^4.2.1"
   },
