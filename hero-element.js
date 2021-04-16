@@ -24,8 +24,27 @@ import html from 'https://cdn.skypack.dev/snabby?min';
         // private properties
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Private_class_fields
         #_model = undefined;
+        #_documentMutationObserver = undefined;
 
         // public methods first
+        
+        resetExperience () {
+            if (this.#_model) {
+                this.#_model = this.#_init({productid: this.#_model.productid});
+            }
+        }
+
+        dynamicallyChangeSelectors () {
+            if (!this.#_documentMutationObserver) {
+                this.#_documentMutationObserver = new MutationObserver((record,observer) => {
+                    console.log('doc was mutated');
+                    if (this.#_model) {
+                        this.#_model = this.#_init({productid: this.#_model.productid});
+                    }
+                });
+            }
+        }
+
         connectedCallback () {
             console.log('we are connected');
             // TODO in the event we need my data - we may not have it passed into the constructor
@@ -35,39 +54,13 @@ import html from 'https://cdn.skypack.dev/snabby?min';
         }
         
         attributeChangedCallback (name, oldValue, newValue) {
-            console.log('attribute changed ', name, oldValue, ' new value ', newValue);
+            // console.log('attribute changed ', name, oldValue, ' new value ', newValue);
     
             if (name === 'product-id') {
                 console.log('would we change hero data for product-id ', newValue);
-                this.#_model = this.#_init({productid: newValue});
+                if (newValue) this.#_model = this.#_init({productid: newValue});
+                // not sure if we should do something else
                 
-            } 
-            if (name === 'ec-json') { // there really is no else, on instantiation all the attributes are registered as changed - listen for the one that matters and update all?
-                // call for data and async await
-            }
-            // if (name === 'hero-reference-selector') {
-            //     console.log('hero reference changed from ', oldValue, ' to --> ', newValue);
-            //     // adjust hero reference and sizing and observer - but not on initialize
-            //     if (this.#_model) {
-            //         if (this.#_model.heroReferenceSelector !== newValue) {
-            //             this.#_setupHeroReference(this.#_model, newValue);
-            //         }
-            //     }
-               
-            // }
-
-            // try a number of selectors - some elements are removed from the dom for mobile view
-            // expect string delimited by semicolon
-            if (name === 'hero-reference-selectors') {
-                console.log('hero reference selectors changed from ', oldValue, ' to --> ', newValue);
-                // adjust hero reference and sizing and observer - but not on initialize
-                if (this.#_model) {
-                    if (this.#_model.heroReferenceSelector !== newValue) {
-                        // this.#_setupHeroReference(this.#_model, newValue);
-                        this.#_model = this.#_init({productid: newValue});
-                    }
-                }
-               
             }
     
             this.#_update();
@@ -93,13 +86,15 @@ import html from 'https://cdn.skypack.dev/snabby?min';
             const myHero = this.#_getMyHero(model.productid);
             if (!myHero) return console.log('no hero in setupHeroReference');
 
-            model.heroReferenceSelector = heroReferenceSelector;
-            model.heroReferenceSelectors = heroReferenceSelector.split(';');
+            model.heroReferenceSelectors = heroReferenceSelectors;
+            model.heroReferenceSelectorArray = heroReferenceSelector.split(';');
+
+            console.log('what are my selectors ', model.heroReferenceSelectorArray)
 
             const _updateHeroSizing = (selector) => {
                 const heroReference = document.querySelector(selector);
-                if (!heroReferenceSelector) {
-                    this.#_model = this.#_init();
+                if (!heroReference) {
+                    this.#_model = this.#_init(this.#_model);
                     
                     return;
                 }
@@ -149,16 +144,23 @@ import html from 'https://cdn.skypack.dev/snabby?min';
                 };
              };
 
+             const _updateHeroMutating = (selector) => {
+                console.log('mutating selector ', selector)
+                _updateHeroSizing(selector);
+             };
+
              
 
-             if (model.heroReferenceSelectors.length) {
-                 model.observers = model.heroReferenceSelectors.reduce((acc, selector) => {
+             if (model.heroReferenceSelectorArray.length) {
+                 model.observers = model.heroReferenceSelectorArray.reduce((acc, selector) => {
                     const elm = document.querySelector(selector);
                     if (!elm) return acc;
 
                     // element may not exists, or may be display none / parent display none
                     // find the element with a client rect
                    if (elm.getClientRects().length) {
+
+                    console.log('which selector is in use ', selector)
                         const parent = elm.parentElement;
                        // trying to create a list of observers
                        const obs = model.observers[selector] || { };
@@ -169,7 +171,7 @@ import html from 'https://cdn.skypack.dev/snabby?min';
                         
                         obs.parentResizer =  obs.resizer || new ResizeObserver( (entries) => {  _updateHeroSizing(selector); });
                         obs.parentResizer.disconnect();
-                        obs.parentMutator = obs.parentMutator || new MutationObserver( (record, observer) => { _updateHeroSizing(selector); });
+                        obs.parentMutator = obs.parentMutator || new MutationObserver( (record, observer) => { _updateHeroMutating(selector); });
                         obs.parentMutator.disconnect();
 
                         obs.resizer.observe(elm);
@@ -201,7 +203,8 @@ import html from 'https://cdn.skypack.dev/snabby?min';
                 fullscreenZindex: '',
                 canExpandWidth: false,
                 canExpandHeight: false,
-                heroReferenceSelector: '',
+                heroReferenceSelectors: '',
+                heroReferenceSelectorArray: [],
                 parentResizeObserver: undefined,
                 
             };
@@ -228,7 +231,11 @@ import html from 'https://cdn.skypack.dev/snabby?min';
                 myHero.style['overflow-y'] = model.canExpandHeight ? 'visible' : 'auto';
                 myHero.style['overflow-x'] = model.canExpandWidth ? 'visible' : 'auto';
 
-                this.#_setupHeroReference( model,  myHero.getAttribute('hero-reference-selector') );
+                if (myHero.getAttribute('dynamically-change-selectors')) {
+                    this.dynamicallyChangeSelectors();
+                }
+
+                this.#_setupHeroReference( model,  myHero.getAttribute('hero-reference-selectors') );
 
             }
 

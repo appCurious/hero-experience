@@ -3,8 +3,15 @@ A custom element for use with a site's hero image which allows user interaction 
 
 ## Event API
 Listen for custom events as users interact with the Custom Hero Element
-* toggle-ribbon-display
-* 
+### toggle-ribbon-display
+event with details indicating if the ribbon items are present or hidden 
+
+## API
+### dynamicallyChangeSelectors() 
+creates a MutationObserver that observers document.body which will compare the hero-reference-selectors and switch to the active hero element
+### resetExperience() 
+each time it is called it will compare the hero-reference-selectors and switch to the active hero element
+
 ## Custom Element Attributes
 ```
 	string: product-id="prod123"	( technically a string starts with chars https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/id )
@@ -13,8 +20,20 @@ Listen for custom events as users interact with the Custom Hero Element
 	string: can-expand-height="true"		(used as boolean)
 	string: can-expand-width="true"		(used as boolean)
 	url:	ec-json="https://myurl.wherever"
-	string: hero-reference-selector="#element-selector" (expects a javascript query selector)
+	string: hero-reference-selectors="#element-selector" ( expects javascript query selectors separated by semicolon ; )
+	string: dynamically-change-selectors="true" (used as truthy comparison)
 ```
+### product-id
+the sku or unique identifier for this product or page as indexed in our system.  this id is used for reporting and data retrieval
+### ec-json
+the url called to retrieve data as it is defined in our system according to your configurations
+### hero-reference-selectors
+the javascript query selector strings that will be used to find and reshape the hero element.  this is a string delimited by a semicolon. We support multiple selectors to provide maximum flexibility for your site to allow the removal, the hidding and the addition of hero elements.  Usual use case is having 1 hero element for mobile display and another for desktop.  The element is in use when it is in the DOM and has a clientRect returned by getClientRects().  elements and elements with parents that are set to display none or hidden do not have a clientRect.  The last element to meet the criteria will be considered to be active.
+
+For resizing and repositioning We observe the element found AND we observe the element parent.  if your needs are different, call resetExperience() or set the dynamically-change-selectors to change selectors as needed. 
+###  dynamically-change-selectors
+a flag that will call dynamicallyChangeSelectors() to setup a MutationObserver to compare hero selectors and change to the hero element that is active.  
+
 
 ## What It Does
 *  Allows an icon to be positioned over a hero image that can be interacted with to display a ribbon with more options
