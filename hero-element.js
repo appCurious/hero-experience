@@ -45,12 +45,25 @@ import html from 'https://cdn.skypack.dev/snabby?min';
             if (name === 'ec-json') { // there really is no else, on instantiation all the attributes are registered as changed - listen for the one that matters and update all?
                 // call for data and async await
             }
-            if (name === 'hero-reference-selector') {
+            // if (name === 'hero-reference-selector') {
+            //     console.log('hero reference changed from ', oldValue, ' to --> ', newValue);
+            //     // adjust hero reference and sizing and observer - but not on initialize
+            //     if (this.#_model) {
+            //         if (this.#_model.heroReferenceSelector !== newValue) {
+            //             this.#_setupHeroReference(this.#_model, newValue);
+            //         }
+            //     }
+               
+            // }
+
+            // try a number of selectors - some elements are removed from the dom for mobile view
+            // expect string delimited by semicolon
+            if (name === 'hero-reference-selectors') {
                 console.log('hero reference changed from ', oldValue, ' to --> ', newValue);
                 // adjust hero reference and sizing and observer - but not on initialize
                 if (this.#_model) {
                     if (this.#_model.heroReferenceSelector !== newValue) {
-                         this.#_setupHeroReference(this.#_model, newValue);
+                        this.#_setupHeroReference(this.#_model, newValue);
                     }
                 }
                
@@ -76,20 +89,42 @@ import html from 'https://cdn.skypack.dev/snabby?min';
     
         #_setupHeroReference(model, heroReferenceSelector) {
             // destroy one if it exists
-            if (model.parentResizeObserver) {
-                model.parentResizeObserver.unobserve(document.querySelector(model.heroReferenceSelector).parentElement);
-                model.parentResizeObserver.disconnect();
-                model.parentResizeObserver = null;
-            }
-            if (model.heroReferenceResizeObserver) {
-                model.heroReferenceResizeObserver.unobserve(document.querySelector(model.heroReferenceSelector));
-                model.heroReferenceResizeObserver.disconnect();
-                model.heroReferenceResizeObserver = null;
-            }
+            // original heroReference may have been removed from the dom
+            // if (model.parentResizeObserver) {
+            //     // model.parentResizeObserver.unobserve(document.querySelector(model.heroReferenceSelector).parentElement);
+            //     model.parentResizeObserver.disconnect();
+            //     model.parentResizeObserver = null;
+            // }
+            // if (model.heroReferenceResizeObserver) {
+            //     // model.heroReferenceResizeObserver.unobserve(document.querySelector(model.heroReferenceSelector));
+            //     model.heroReferenceResizeObserver.disconnect();
+            //     model.heroReferenceResizeObserver = null;
+            // }
+            
+            // might need this or some form of this
+            // if (model.observers) model.observers.forEach ()
+
             const myHero = this.#_getMyHero(model.productid);
-             // need to destroy the existing observer if there is one - before setting this
-             model.heroReferenceSelector = heroReferenceSelector;
-             const heroReference = model.heroReferenceSelector ? document.querySelector(model.heroReferenceSelector) : null;
+            if (!myHero) return console.log('no hero in setupHeroReference');
+
+            model.heroReferenceSelector = heroReferenceSelector;
+            model.heroReferenceSelectors = heroReferenceSelector.split(';');
+            
+
+            // const heroReference = model.heroReferenceSelector ? document.querySelector(model.heroReferenceSelector) : null;
+            // heroReference will be the first one that wins - 
+            // never tried this
+            // nope going to need all and need to try to recreate them if they do not exist or if one has not rect
+            // const heroReference = model.heroReferenceSelectors.reduce((acc, selector) => {
+            //     if (!acc) {
+            //         const elm = document.querySelector(selector);
+                    
+            //         // element may not exists, or may be display none / parent display none
+            //         // find the element with a client rect
+            //         acc = !elm ? '' : elm.getClientRects().length ? selector : '';
+            //     }
+            //     return acc;
+            // },'');
 
             const _updateHeroSizing = () => {
                 // working to get the correct positioning
@@ -99,6 +134,10 @@ import html from 'https://cdn.skypack.dev/snabby?min';
                 // adjusting for visualView port was a solution
                 // continue to experiment on sites to see what happens
                 const rect = heroReference.getClientRects()[0];
+
+                // parent or element display none
+                if (!rect) return;
+
                 rect.y += visualViewport.pageTop;
 
                 // working to position custom element over the hero
@@ -127,24 +166,39 @@ import html from 'https://cdn.skypack.dev/snabby?min';
                     'z-index': myHero.style['z-index']
                 };
              };
-             if (heroReference) {
-                 console.log('we got heroReference ', heroReference)
-                 // was trying to place a div in the custom element and move it around, but that's not quite working
-                 // const heroWrapper = document.createElement('div');
-                 // heroWrapper.id = 'my-custom-element';
-                 // myHero.append(heroWrapper);
+            //  if (heroReference) {
+            //      console.log('we got heroReference ', heroReference)
+            //      // was trying to place a div in the custom element and move it around, but that's not quite working
+            //      // const heroWrapper = document.createElement('div');
+            //      // heroWrapper.id = 'my-custom-element';
+            //      // myHero.append(heroWrapper);
 
-                 // we are positioning the hero element over the parent
-                 // for accuracy place an observer here for resize or reposition
-                model.heroReferenceResizeObserver = new ResizeObserver( (entries) => {  _updateHeroSizing(); });
-                model.parentResizeObserver = new ResizeObserver( (entries) => {  _updateHeroSizing(); });
+            //      // we are positioning the hero element over the parent
+            //      // for accuracy place an observer here for resize or reposition
+            //     // model.heroReferenceResizeObserver = new ResizeObserver( (entries) => {  _updateHeroSizing(); });
+            //     // model.parentResizeObserver = new ResizeObserver( (entries) => {  _updateHeroSizing(); });
 
 
-                 // should experiment and watch other elements to see position change - smaller window | mobile
-                 // model.parentResizeObserver.observe(heroReference);
-                 // model.parentResizeObserver.observe(myHero.parentElement);
-                 model.heroReferenceResizeObserver.observe(heroReference);
-                 model.parentResizeObserver.observe(heroReference.parentElement);                   
+            //      // should experiment and watch other elements to see position change - smaller window | mobile
+            //      // model.parentResizeObserver.observe(heroReference);
+            //      // model.parentResizeObserver.observe(myHero.parentElement);
+            //     //  model.heroReferenceResizeObserver.observe(heroReference);
+            //     //  model.parentResizeObserver.observe(heroReference.parentElement);                   
+            //  }
+
+             if (model.heroReferenceSelectors.length) {
+                 model.observers = model.heroReferenceSelectors.reduce((acc, selector) => {
+                    const elm = document.querySelector(selector);
+                    if (!elm) return acc;
+
+                    // element may not exists, or may be display none / parent display none
+                    // find the element with a client rect
+                   if (elm.getClientRects().length) {
+                       // trying to create a list of observers
+                   }
+
+                    return acc;
+                 },[]);
              }
         }
     
