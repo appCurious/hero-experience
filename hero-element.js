@@ -145,6 +145,8 @@ export default class MyHeroExperience extends HTMLElement {
             myHero.style.height = `${rect.height}px`;
             myHero.style['max-height'] = `${rect.height}px`;
             myHero.style['z-index'] = model.fullscreenZindex;
+            
+            this.#_model.displayWidth = rect.width;
 
             // record reset styles to apply after fullscreen
             model.resetStyles = {
@@ -160,54 +162,54 @@ export default class MyHeroExperience extends HTMLElement {
                 left: myHero.style.left,
                 'z-index': myHero.style['z-index']
             };
-            };
+        };
 
-            const _updateHeroMutating = (selector) => {
+        const _updateHeroMutating = (selector) => {
             console.log('mutating selector ', selector)
             _updateHeroSizing(selector);
-            };
+        };
 
+        
+
+        if (model.heroReferenceSelectorArray.length) {
+            console.log('these are all selectors ', model.heroReferenceSelectorArray, ' from ',  )
+            model.observers = model.heroReferenceSelectorArray.reduce((acc, selector) => {
+            if (!selector) return acc;
             
+            const elm = document.querySelector(selector);
+            if (!elm) return acc;
 
-            if (model.heroReferenceSelectorArray.length) {
-                console.log('these are all selectors ', model.heroReferenceSelectorArray, ' from ',  )
-                model.observers = model.heroReferenceSelectorArray.reduce((acc, selector) => {
-                if (!selector) return acc;
+            // element may not exists, or may be display none / parent display none
+            // find the element with a client rect
+            if (elm.getClientRects().length) {
+
+            console.log('which selector is in use ', selector)
+                const parent = elm.parentElement;
+                // trying to create a list of observers
+                const obs = model.observers[selector] || { };
+
+                obs.resizer = obs.resizer || new ResizeObserver( (entries) => {  _updateHeroSizing(selector); });
+                obs.resizer.disconnect();
+                // obs.mutator = obs.mutator || new MutationObserver( (record, observer) => {  _updateHeroSizing(selector); });
                 
-                const elm = document.querySelector(selector);
-                if (!elm) return acc;
+                obs.parentResizer =  obs.resizer || new ResizeObserver( (entries) => {  _updateHeroSizing(selector); });
+                obs.parentResizer.disconnect();
+                obs.parentMutator = obs.parentMutator || new MutationObserver( (record, observer) => { _updateHeroMutating(selector); });
+                obs.parentMutator.disconnect();
 
-                // element may not exists, or may be display none / parent display none
-                // find the element with a client rect
-                if (elm.getClientRects().length) {
+                obs.resizer.observe(elm);
+                // obs.mutator.observe(elm, { attributes: true, childList: true, subtree: true } ); // may not need
 
-                console.log('which selector is in use ', selector)
-                    const parent = elm.parentElement;
-                    // trying to create a list of observers
-                    const obs = model.observers[selector] || { };
-
-                    obs.resizer = obs.resizer || new ResizeObserver( (entries) => {  _updateHeroSizing(selector); });
-                    obs.resizer.disconnect();
-                    // obs.mutator = obs.mutator || new MutationObserver( (record, observer) => {  _updateHeroSizing(selector); });
-                    
-                    obs.parentResizer =  obs.resizer || new ResizeObserver( (entries) => {  _updateHeroSizing(selector); });
-                    obs.parentResizer.disconnect();
-                    obs.parentMutator = obs.parentMutator || new MutationObserver( (record, observer) => { _updateHeroMutating(selector); });
-                    obs.parentMutator.disconnect();
-
-                    obs.resizer.observe(elm);
-                    // obs.mutator.observe(elm, { attributes: true, childList: true, subtree: true } ); // may not need
-
-                    obs.parentResizer.observe(parent);
-                    obs.parentMutator.observe(parent, { attributes: true, childList: true, subtree: true } );
-                    
-                    acc[selector] = obs;
-                }
-
-                return acc;
-
-                },{});
+                obs.parentResizer.observe(parent);
+                obs.parentMutator.observe(parent, { attributes: true, childList: true, subtree: true } );
+                
+                acc[selector] = obs;
             }
+
+            return acc;
+
+            },{});
+        }
     }
 
     #_init (configs) {
@@ -220,6 +222,7 @@ export default class MyHeroExperience extends HTMLElement {
         const model = {
             productid: configs.productid,
             observers: {},
+            displayWidth: 600,
             fullscreenPosition: '',
             fullscreenZindex: '',
             canExpandWidth: false,
@@ -299,7 +302,7 @@ export default class MyHeroExperience extends HTMLElement {
                 margin: 10px;
                 width: 40px;
                 height: 40px;
-                background-color: blue;
+                background-color: black;
             }
             
             .my-custom-element--item-view {
