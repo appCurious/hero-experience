@@ -125,7 +125,7 @@ function createMyHero (selector, position) {
 			target.insertAdjacentHTML(position, customElementHtml);    
 		}
 	}
-}
+}createMyHero(); var hero = document.querySelector('my-hero-experience');
 
 createMyHero('#realHeroContainer','afterbegin');
 
