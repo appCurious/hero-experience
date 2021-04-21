@@ -4,7 +4,37 @@
 import html from 'https://cdn.skypack.dev/snabby?min';
 
 const _delimiter = ';';
+const keyboardNavigation = {
+    
+};
+function mockTable (items = []) {
+    console.log('mockTable ', items)
+    const buildHeader = (item) => {
+        return html`
+            <th>Product-${item.widgetId}</th>
+        `;
+    }
 
+    const buildTableBody = () => {
+        let headers;
+        const body = items.map((d) => {
+            headers += buildHeader(d);
+            return html`<td>
+                you need ${d.widgetId} in your life
+            </td>`;
+        });
+
+        return html`<table>
+            <tr>${headers}</tr>
+            <tr>${body}</tr>
+        </table>
+        `;
+    };
+
+    return html`<div>
+        ${buildTableBody()}
+    </div>`;
+}
 
 // possibly extract out reusable code to a base element MyBaseElement extends HTMLElement
 // attaching shadow dom might be good candidate for base element
@@ -408,7 +438,20 @@ export default class MyHeroExperience extends HTMLElement {
                 border-right: solid 10px transparent;
                 border-bottom: solid 10px white;
             }
-            
+            .my-custom-element button {
+                height: 100%;
+                width: 100%;
+                background: inherit;
+            }
+            .my-custom-element button:focus {
+                outline: solid 3px red;
+            }
+            table {
+                color: white;
+                width: 100%;
+                height: auto;
+
+            }
 
         `;
 
@@ -421,15 +464,50 @@ export default class MyHeroExperience extends HTMLElement {
         const leftHidden = '-200px';
         
 
-        this.#_model.items = [{widgetId:1},{widgetId:2},{widgetId:3}];
+        this.#_model.items = [{widgetId:1, type: 'InteractiveTour'},{widgetId:2, type: 'ImageGallery'},{widgetId:3, type: 'DocumentGallery'}];
         const itemsWidth = `${this.#_model.items.length * 50}px`;// '150px';
 
+        const _setElementFocus = (selector) => {
+            const elem = this.shadowRoot.querySelector(selector);
+            console.log('what is elem ', elem, selector)
+            if (elem != null) elem.focus();
+        };
+
+        /**
+         * 
+         * @param {kepress event} ev 
+         * @param {widgetId} itemId 
+         * Based on https://webaim.org/techniques/keyboard/  accessibility keyboard navigation
+         * this function sets focus on the identified ribbon item
+         * this would include setting the focus on the the ribbon icon ( clickable ribbon expand button ) when the last element is tabbed awayfrom
+         */
+        const _navigateToRibbonItem = (ev, selector) => {
+            console.log('keypress ',ev, ' for  ', selector)
+            // ev.preventDefault();
+            if (ev.key === 'Tab') {
+                ev.preventDefault();
+                _setElementFocus(selector);
+            }
+        };
     
         const _createRibbonItems = () => {
+            let tabIndex = 0;
 
             return this.#_model.items.map((item) => {
-                return html`<div class="my-custom-element--item ${this.#_model.displayItem === item.widgetId ? 'selected' : ''}"
-                    @on:click="${() => _displayItem(item.widgetId)}">
+                tabIndex++;
+                const isSelected = this.#_model.displayItem === item.widgetId;
+                const isLast = tabIndex === this.#_model.items.length;
+                const detailSelector = `#my-custom-element-4567896878787-${item.widgetId}`;
+
+                return html`<div class="my-custom-element--item ${isSelected ? 'selected' : ''}">
+                    <button id="my-custom-element-4567896878787-ribbon-item-${item.widgetId}"
+                        @attrs:aria-hidden="${!this.#_model.ribbonVisible}"
+                        @attrs:tabindex="${!this.#_model.ribbonVisible ? '-1': '0'}"
+                        @attrs:aria-label="clickable product ${item.type}"
+                        @on:click="${() => _toggleDisplayItem(item.widgetId)}"
+                        @on:keydown="${ isLast && !isSelected ? (ev) => _navigateToRibbonItem( ev, '.my-ribbon-icon button' ) : 
+                        isSelected ? (ev) => _navigateToRibbonItem(ev, detailSelector) : '' }">
+                    </button>
                 </div>`;
             });
         };
@@ -453,7 +531,7 @@ export default class MyHeroExperience extends HTMLElement {
             this.#_update();
         };
 
-        const _displayItem = (itemId) => {
+        const _toggleDisplayItem = (itemId) => {
             // we would go get the model item and corresponding widget display
             // but here we are going to take up the space given to us
             console.log('my display item')
@@ -464,6 +542,8 @@ export default class MyHeroExperience extends HTMLElement {
             _closeItem();
             this.#_model.displayItem = itemId;
             this.#_update();
+
+            _setElementFocus(`#my-custom-element-4567896878787-${itemId}`);
 
         };
 
@@ -480,23 +560,36 @@ export default class MyHeroExperience extends HTMLElement {
             this.#_update();
         };
 
-
+/** @attrs:role="button"
+                    @attr:aria-pressed="${this.#_model.isFullscreen}" */
 
         const _renderItem = () => {
             // would take this.#_model.displayItem and its data to display
             // look up and instantiate
-            
+            const navigationSelector = `#my-custom-element-4567896878787-ribbon-item-${this.#_model.displayItem}`;
+
             let transitionClass = ' my-custom-element--item-view-expands-';
             transitionClass += this.#_model.canExpandWidth && this.#_model.canExpandHeight ? 'height-width' : this.#_model.canExpandHeight ? 'height' : this.#_model.canExpandWidth ? 'width' : 'false';
-            return html`<div id="my-custom-element-4567896878787" @key="my-custom-element-4567896878787" class="my-custom-element--item-view${this.#_model.isFullscreen ? ' fullscreen' : ''}${transitionClass}"
+            
+            return html`<div id="my-custom-element-4567896878787-${this.#_model.displayItem}" class="my-custom-element--item-view${this.#_model.isFullscreen ? ' fullscreen' : ''}${transitionClass}"
+                tabindex="0"
+                @attrs:aria-label="viewing ${(this.#_model.items.find((el) => el.widgetId === this.#_model.displayItem)).type}product information"
+                @key="my-custom-element-4567896878787-${this.#_model.displayItem}"
                 @style:width="${!this.#_model.isFullscreen && this.#_model.canExpandWidth ? 'auto' : '100%'}"
                 @style:height="${!this.#_model.isFullscreen && this.#_model.canExpandHeight ? 'auto' : '100%' }"
                 @style:transition="height 1.5s ease, width 1.7s ease;">
 
                 <div class="my-custom-element-col-2">
                     <div class="my-custom-element--top-left my-custom-element--item">Top Left</div>
-                    <div class="my-custom-element--top-right my-custom-element--item"
-                    @on:click="${_toggleItemFullScreen}">fullscreen</div>
+                    <div class="my-custom-element--top-right my-custom-element--item">
+                    
+                        <button class="my-custom-element-fullscreen-button"
+                            @attrs:aria-label="${this.#_model.isFullscreen ? 'clickable close fullscreen' : 'clickable open fullscreen'}"
+                            @on:click="${_toggleItemFullScreen}"
+                            @on:keydown="${ (ev) => _navigateToRibbonItem(ev, navigationSelector) }">
+                        </button>
+                        fullscreen
+                    </div>
                 </div>
 
                 <div class="my-custom-element--center"
@@ -506,19 +599,22 @@ export default class MyHeroExperience extends HTMLElement {
                     
                         @style:height="1000px"
                         @style:width="1000px">
-                        ${this.#_model.displayItem}-Center-${this.#_model.displayItem}
+                        <div>${this.#_model.displayItem}-Center-${this.#_model.displayItem}</div>
+                        ${mockTable(this.#_model.items)}
                     </div>
                 </div>
                 <div class="my-custom-element-col-2">
                     <div class="my-custom-element--bottom-left my-custom-element--item">Bottom Left</div>
                     <div class="my-custom-element--bottom-right my-custom-element--item">Bottom Right</div>
                 </div>
-            </div>
-            `;
+            </div>`;
         };
 
         
-        
+        /**@attrs:role="button"
+                        @attr:aria-pressed="${this.#_model.ribbonVisible}"
+                         @attrs:aria-hidden="${!this.#_model.ribbonVisible}"
+                        */
         
         return html`
             <div class="my-custom-element ${this.#_model.isFullscreen ? 'my-custom-element-fullscreen' : ''}">
@@ -528,15 +624,16 @@ export default class MyHeroExperience extends HTMLElement {
                 <slot id="my-custom-element-slot-hero" name="my-hero-container-top"></slot>
                 <div class="my-ribbon"
                     @style:width="${this.#_model.ribbonVisible ? itemsWidth : collapsedWidth}">
-                    <div class="my-ribbon-icon"
-                        @on:click="${_toggleRibbon}">
-                        
+                    <div class="my-ribbon-icon">
+                        <button
+                            @attrs:aria-label="clickable item list${this.#_model.ribbonVisible ? ' open' : ' closed'}"
+                            @on:click="${_toggleRibbon}">
+                        </button>
                     </div>
                     
                     <div class="my-ribbon-items"
                         @style:left="${this.#_model.ribbonVisible ? leftDisplay : leftHidden }"
                         @style:width="${this.#_model.ribbonVisible ? itemsWidth : '0px'}">
-
                         ${_createRibbonItems()}
                     </div>
                 

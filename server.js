@@ -9,6 +9,10 @@ app.use(cors());
 
 app.use(express.static(__dirname));
 
+app.get('/', function(req, res) {
+	res.sendFile(__dirname + '/index.html');
+});
+
 app.get('/my-hero', function (req, res) {
 	console.log('requesting hero js')
 	res.sendFile(__dirname + '/hero-element.js');

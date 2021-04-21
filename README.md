@@ -1,6 +1,23 @@
 # Prototyping Custom Hero Image Element
 A custom element for use with a site's hero image which allows user interaction to display more information.  Concept allows for working with a custom element where the styling and control is given to the website owner.  This prototyping process helps to discover element attributes that empower the owner to control the custom element AND allows the developer to work within the custom element to discover the proper attributes necessary to function effectively.
 
+## Accessibility
+Considerations for Accessibility are at the top of the documentation because it is important.  Often abilities are taken for granted or,  perhaps more accurately stated, they are utilized effortlessly and exercised unconsciously.  With that in mind, Accessibility is on top to help create an awareness for considerations I was overlooking.
+
+## Accessibility links
+* https://www.a11yproject.com/checklist/
+* https://webaim.org/techniques/keyboard/
+* https://axesslab.com/switches/
+
+## Accessibility Considerations - To Start With
+* timeouts and timers for page viewing / form submission shall take into consideration a reasonable amount of time and provide a way for the user to reset or extend the timer
+* keyboard navigation shall follow element order. element order shall be intuitive to the user based on layout
+* anchors shall have the href attribute populated with text
+* modals shall keep focus until closed
+* when tabbing on the last modal element the focus shall be placed on the element that opened the modal
+
+
+
 ## Event API
 Listen for custom events as users interact with the Custom Hero Element
 ### toggle-ribbon-display
@@ -71,6 +88,12 @@ If you are using the same page for mobile presentation and you hide, remove or u
 * Set the ec-json="https://myurl.wherever" to retreive the overlay content
 
 
+## Development and Accessibility Testing
+The index file is provided as a convenient way to work with the code and display the test ribbon.
+``` 
+noder server 
+```
+browse to https://localhost:50021/
 
 ## Manual Site Testing ( on an existing site already hosted )
 It's a way to see what the custom element would look like on someone's existing site

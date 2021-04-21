@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<head>
+    
+<style>
+    .app {
+        background-color: brown;
+    }
+    .page-header,
+    .page-footer {
+        height: 100px;
+        width: 100%;
+        background-color: blue;
+    }
+
+    button:focus {
+        outline: solid 8px brown;
+    }
+    .reference-clickables button:focus {
+        outline-color: blue;
+    }
+    .menu-button {
+        margin: 10px;
+    }
+
+    .main-content {
+        width: 100%;
+    }
+    .hero-image-container {
+        display: flex;
+        height: 500px;
+        width: 500px;
+        background-color: yellow;
+    }
+    .hero-thumbs {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        align-items: center;
+        height: 100%;
+        width: 100px;
+        background-color: blue;
+    }
+    .hero-thumb {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 50px;
+        width: 50px;
+        background: yellow;
+    }
+    .hero-image {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        width: 400px;
+        background-color: green;
+    }
+    
+    my-hero-experience.my-hero-parent {
+        position: relative;
+        position: fixed;
+        position: absolute;
+        
+        
+        height: 100%;
+        width: 100%;
+        /*height: inherit;*/
+        /*width: inherit;*/
+        
+        z-index: 20;
+    }
+</style>
+</head>
+<body>
+    <div class="app">
+        
+        <my-hero-experience
+            aria-label="product image details"
+            class="my-hero-parent" 
+            product-id="123" 
+            fullscreen-position="fixed" 
+            fullscreen-zindex="20012" 
+            can-expand-height="true" 
+            can-expand-width="true"
+            hero-reference-selectors=".hero-image"
+
+            style="overflow: visible;">
+        </my-hero-experience>
+        <div class="page-header">
+            <button class="menu-button"
+                aria-label="clickable menu"
+            >Menu Button</button>
+        </div>
+
+        <div class="main-content">
+            <div class="hero-image-container">
+                <div class="hero-thumbs">
+                    <div class="hero-thumb">image</div>
+                    <div class="hero-thumb">image</div>
+                    <div class="hero-thumb">image</div>
+                </div>
+                <div class="hero-image">image</div>
+            </div>
+            
+        </div>
+        <div class="reference-clickables">
+            <button class="menu-button" aria-label="ref 1">Product Reference</button>
+            <button class="menu-button" aria-label="ref 2">Product Reference</button>
+            <button class="menu-button" aria-label="ref 3">Product Reference</button>
+        </div>
+        <div class="page-footer"></div>
+
+        
+    </div>
+
+    <script>
+                
+        function createMyHero (selector, position) {
+            const hed = document.querySelector('head');
+            const s = document.createElement('script');
+            s.id="my-hero-element-script";
+            s.type="module";
+            //s.src = "https://cdn.jsdelivr.net/gh/appCurious/hero-experience/hero-element.js";
+            s.src = "https://localhost:50021/my-hero";
+            hed.append(s);
+            
+            if (selector && position) {
+                const target = document.querySelector(selector);
+                const customElementHtml = `<style>
+                    .my-hero-parent {
+                        position: relative;
+                        position: fixed;
+                        position: absolute;
+                        
+                        
+                        height: 100%;
+                        width: 100%;
+                        /*height: inherit;*/
+                        /*width: inherit;*/
+                        
+                        z-index: 20012;
+                    }
+                </style>
+                <my-hero-experience 
+                    class="my-hero-parent" 
+                    product-id="123"
+                    fullscreen-position="fixed"
+                    fullscreen-zindex="20012"
+                    can-expand-height="true"
+                    can-expand-width="true"
+                    hero-reference-selector="">
+                </my-hero-experience>`
+                
+                if (target) {
+                    target.insertAdjacentHTML(position, customElementHtml);    
+                }
+            }
+        }createMyHero(); var hero = document.querySelector('my-hero-experience');
+    </script>
+</body>
