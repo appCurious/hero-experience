@@ -10,18 +10,16 @@ const keyboardNavigation = {
 function mockTable (items = []) {
     console.log('mockTable ', items)
     const buildHeader = (item) => {
-        return html`
-            <th>Product-${item.widgetId}</th>
-        `;
+        console.log('what is the item for a header ', item)
+        return html`<th>Product-${item.widgetId}</th>`;
     }
 
     const buildTableBody = () => {
-        let headers;
+        let headers = [];
         const body = items.map((d) => {
-            headers += buildHeader(d);
-            return html`<td>
-                you need ${d.widgetId} in your life
-            </td>`;
+            headers.push(buildHeader(d));
+            console.log('what is my header ', headers)
+            return html`<td> we could use ${d.description} in our lives </td>`;
         });
 
         return html`<table>
@@ -452,6 +450,21 @@ export default class MyHeroExperience extends HTMLElement {
                 height: auto;
 
             }
+            tr {
+                display: flex;
+                width: 100%;
+                justify-content: space-between;
+            }
+            td {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin: 5px;
+                border: solid;
+                width: 100%;
+                text-align: center;
+                
+            }
 
         `;
 
@@ -464,7 +477,7 @@ export default class MyHeroExperience extends HTMLElement {
         const leftHidden = '-200px';
         
 
-        this.#_model.items = [{widgetId:1, type: 'InteractiveTour'},{widgetId:2, type: 'ImageGallery'},{widgetId:3, type: 'DocumentGallery'}];
+        this.#_model.items = [{widgetId:1, type: 'InteractiveTour', description: "music"},{widgetId:2, type: 'ImageGallery', description: "art"},{widgetId:3, type: 'DocumentGallery', description: "code"}];
         const itemsWidth = `${this.#_model.items.length * 50}px`;// '150px';
 
         const _setElementFocus = (selector) => {
