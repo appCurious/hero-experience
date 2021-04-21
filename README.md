@@ -19,18 +19,20 @@ Considerations for Accessibility are at the top of the documentation because it 
 ## Display and Navigation
 ascii art https://github.com/mreinstein/ascii-diagrams
 
+```
+
           ◀───────────────────────────────┐     
- ┌------------┐      ┌--------┐       ┌---┴---┐ 
- │Ribbon Icon │      │        │       │ Last  │ 
+ ┌------------┐       ┌--------┐       ┌---┴---┐ 
+ │Ribbon Icon │       │        │       │ Last  │ 
  │            ├─────▶│ Ribbon ├──────▶│ Ribbon│ 
- │            │      │ Item   │       │ Item  │ 
- │            │      │        │       │       │ 
- └------------┘      └┬-------┘       └-------┘ 
-                      │   ▲                     
-                      │   │                     
-                      │   │                     
-                      ▼   │                     
-┌-------------------------┴--------------------┐
+ │            │       │ Item   │       │ Item  │ 
+ │            │       │        │       │       │ 
+ └------------┘       └┬-------┘       └-------┘ 
+                       │   ▲                     
+                       │   │                     
+                       │   │                     
+                       ▼   │                     
+┌--------------------------┴-------------------┐
 │                                              │
 │                                              │
 │      Item Display                            │
@@ -44,7 +46,7 @@ ascii art https://github.com/mreinstein/ascii-diagrams
 │                                              │
 │                                              │
 └----------------------------------------------┘
-
+```
 
 ## Event API
 Listen for custom events as users interact with the Custom Hero Element
