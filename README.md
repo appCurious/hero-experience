@@ -16,6 +16,34 @@ Considerations for Accessibility are at the top of the documentation because it 
 * modals shall keep focus until closed
 * when tabbing on the last modal element the focus shall be placed on the element that opened the modal
 
+## Display and Navigation
+ascii art https://github.com/mreinstein/ascii-diagrams
+
+          ◀───────────────────────────────┐     
+ ┌------------┐      ┌--------┐       ┌---┴---┐ 
+ │Ribbon Icon │      │        │       │ Last  │ 
+ │            ├─────▶│ Ribbon ├──────▶│ Ribbon│ 
+ │            │      │ Item   │       │ Item  │ 
+ │            │      │        │       │       │ 
+ └------------┘      └┬-------┘       └-------┘ 
+                      │   ▲                     
+                      │   │                     
+                      │   │                     
+                      ▼   │                     
+┌-------------------------┴--------------------┐
+│                                              │
+│                                              │
+│      Item Display                            │
+│                                              │
+│      Clicking Ribbon Item Opens View         │
+│                                              │
+│      Keyboard tab navigates within the view  |
+|                                              | 
+| Last element tab will return to ribbon item  │
+│                                              │
+│                                              │
+│                                              │
+└----------------------------------------------┘
 
 
 ## Event API
@@ -88,7 +116,7 @@ If you are using the same page for mobile presentation and you hide, remove or u
 * Set the ec-json="https://myurl.wherever" to retreive the overlay content
 
 
-## Development and Accessibility Testing
+## Development
 The index file is provided as a convenient way to work with the code and display the test ribbon.
 ``` 
 noder server 
