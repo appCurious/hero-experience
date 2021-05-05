@@ -73,49 +73,65 @@
 </style>
 </head>
 <body>
-    <div class="app">
-        
-        <my-hero-experience
-            aria-label="product image details"
-            class="my-hero-parent" 
-            product-id="123" 
-            fullscreen-position="fixed" 
-            fullscreen-zindex="20012" 
-            can-expand-height="true" 
-            can-expand-width="true"
-            hero-reference-selectors=".hero-image"
+    
 
-            style="overflow: visible;">
-        </my-hero-experience>
-        <div class="page-header">
-            <button class="menu-button"
-                aria-label="clickable menu"
-            >Menu Button</button>
-        </div>
+    <script type="module">
+        import html from 'https://cdn.skypack.dev/snabby?min';
 
-        <div class="main-content">
-            <div class="hero-image-container">
-                <div class="hero-thumbs">
-                    <div class="hero-thumb">image</div>
-                    <div class="hero-thumb">image</div>
-                    <div class="hero-thumb">image</div>
+        function renderApp () {
+            return html`<div class="app">
+                <div class="page-header">
+                    <button class="menu-button"
+                        aria-label="clickable menu">
+                        Menu Button
+                    </button>
                 </div>
-                <div class="hero-image">image</div>
-            </div>
-            
-        </div>
-        <div class="reference-clickables">
-            <button class="menu-button" aria-label="ref 1">Product Reference</button>
-            <button class="menu-button" aria-label="ref 2">Product Reference</button>
-            <button class="menu-button" aria-label="ref 3">Product Reference</button>
-        </div>
-        <div class="page-footer"></div>
+                <my-hero-experience
+                    aria-label="product image details"
+                    class="my-hero-parent" 
+                    product-id="123" 
+                    fullscreen-position="fixed" 
+                    fullscreen-zindex="20012" 
+                    can-expand-height="true" 
+                    can-expand-width="true"
+                    hero-reference-selectors=".hero-image"
 
-        
-    </div>
+                    style="overflow: visible;">
+                </my-hero-experience>
+                <div class="main-content">
+                    <div class="hero-image-container">
+                        <div class="hero-thumbs">
+                            <div class="hero-thumb">image</div>
+                            <div class="hero-thumb">image</div>
+                            <div class="hero-thumb">image</div>
+                        </div>
+                        <div class="hero-image">image</div>
+                    </div>
+                    
+                </div>
+                <div class="reference-clickables">
+                    <button class="menu-button" aria-label="ref 1">Product Reference</button>
+                    <button class="menu-button" aria-label="ref 2">Product Reference</button>
+                    <button class="menu-button" aria-label="ref 3">Product Reference</button>
+                </div>
+                <div>
+                    <p>Just some text and some more controls to see if tab gets here.  
+                        Not sure what is happening in the real situation but using snabby 
+                        it is not tabbing into the children div elemnts
 
-    <script>
-                
+                    </p>
+                    <div class="reference-clickables">
+                        <button class="menu-button" aria-label="ref 4">Reviews</button>
+                        <button class="menu-button" aria-label="ref 5">Reviews</button>
+                        <button class="menu-button" aria-label="ref 6">Reviews</button>
+                    </div>
+                </div>
+                <div class="page-footer"></div>                
+            </div>`;
+        }
+
+        html.update(document.body, renderApp());
+
         function createMyHero (selector, position) {
             const hed = document.querySelector('head');
             const s = document.createElement('script');

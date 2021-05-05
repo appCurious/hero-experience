@@ -4,7 +4,15 @@ A custom element for use with a site's hero image which allows user interaction 
 ## Accessibility
 Considerations for Accessibility are at the top of the documentation because it is important.  Often abilities are taken for granted or,  perhaps more accurately stated, they are utilized effortlessly and exercised unconsciously.  With that in mind, Accessibility is on top to help create an awareness for considerations I was overlooking.
 
+### Accessibility As Assistive CSS
+Think of Accessibility as CSS for assistive technologies.  That is a very intreguing statement.  What if we placed as much emphasis and investment on accessibility as we have invested and investigated better styling?  How would that change our approach to coding?
+* https://www.w3.org/TR/wai-aria-practices-1.1/
+
+
+
 ## Accessibility links
+* https://www.w3.org/TR/wai-aria-practices-1.1/
+* https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques
 * https://www.a11yproject.com/checklist/
 * https://webaim.org/techniques/keyboard/
 * https://axesslab.com/switches/
@@ -15,6 +23,8 @@ Considerations for Accessibility are at the top of the documentation because it 
 * anchors shall have the href attribute populated with text
 * modals shall keep focus until closed
 * when tabbing on the last modal element the focus shall be placed on the element that opened the modal
+* visual cue should be given when an element has focus
+* do not allow focus on hidden / inactive / or elements that are not inteded to be navigated to
 
 ## Display and Navigation
 ascii art https://github.com/mreinstein/ascii-diagrams

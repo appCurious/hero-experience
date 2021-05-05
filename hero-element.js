@@ -503,6 +503,8 @@ export default class MyHeroExperience extends HTMLElement {
             }
         };
     
+        // @on:keydown="${ isLast && !isSelected ? (ev) => _navigateToRibbonItem( ev, '.my-ribbon-icon button' ) : 
+        // isSelected ? (ev) => _navigateToRibbonItem(ev, detailSelector) : '' }">
         const _createRibbonItems = () => {
             let tabIndex = 0;
 
@@ -518,9 +520,9 @@ export default class MyHeroExperience extends HTMLElement {
                         @attrs:tabindex="${!this.#_model.ribbonVisible ? '-1': '0'}"
                         @attrs:aria-label="clickable product ${item.type}"
                         @on:click="${() => _toggleDisplayItem(item.widgetId)}"
-                        @on:keydown="${ isLast && !isSelected ? (ev) => _navigateToRibbonItem( ev, '.my-ribbon-icon button' ) : 
-                        isSelected ? (ev) => _navigateToRibbonItem(ev, detailSelector) : '' }">
+                        @on:keydown="${ isLast && !isSelected ? (ev) => _navigateToRibbonItem( ev, '.my-ribbon-icon button' ) : '' }">
                     </button>
+                    ${isSelected ? _renderItem() : ''}
                 </div>`;
             });
         };
@@ -628,6 +630,9 @@ export default class MyHeroExperience extends HTMLElement {
                         @attr:aria-pressed="${this.#_model.ribbonVisible}"
                          @attrs:aria-hidden="${!this.#_model.ribbonVisible}"
                         */
+
+        // try to render in html tab order - moving to item render
+        // ${this.#_model.displayItem ? _renderItem() : ''}
         
         return html`
             <div class="my-custom-element ${this.#_model.isFullscreen ? 'my-custom-element-fullscreen' : ''}">
@@ -652,7 +657,7 @@ export default class MyHeroExperience extends HTMLElement {
                 
                     
                 </div>
-                ${this.#_model.displayItem ? _renderItem() : ''}
+                
             </div>
         `;
     }
