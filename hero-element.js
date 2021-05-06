@@ -85,7 +85,7 @@ export default class MyHeroExperience extends HTMLElement {
 
     static get observedAttributes () { return [ 'product-id', 'ec-json', 'hero-reference-selectors' ]; }
 
-    static registerCustomModule () { window.customElements.define('my-hero-experience', MyHeroExperience); }
+    static registerCustomModule () { !customElements.get('my-hero-experience') ? window.customElements.define('my-hero-experience', MyHeroExperience) : ''; }
 
 
     // private methods after public methods

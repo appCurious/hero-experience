@@ -1,7 +1,8 @@
 import MyHeroExperience from './hero-element.js';
 import html from 'snabby';
 
-let currentVnode;
+let currentVnode = document.querySelector('.app');
+let model;
 const update = () => {
     const newVnode = view(model, update);
     currentVnode = html.update(currentVnode, newVnode);
@@ -137,9 +138,10 @@ function renderApp () {
 
 
 
-
-view();
+update();
 // we could also try to inject the hero experienece instead of creating it in the view...
 // stage a hero element and inject the custom experience into that.
 
 MyHeroExperience.registerCustomModule();
+
+

@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rollup -c rollup.config.js --compact"
+    "build": "rollup -c rollup.config.js --compact",
+    "start": "node server"
   },
   "keywords": [
     "hero",
@@ -24,6 +25,7 @@
     "express": "^4.17.1",
     "openssl": "^1.1.0",
     "rollup": "^2.44.0",
+    "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-es6-class-minify": "^1.2.0",
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-url-resolve": "^0.1.1"

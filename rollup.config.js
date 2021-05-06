@@ -2,6 +2,7 @@
 // import {terser} from 'rollup-plugin-terser';
 import resolve  from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
+import copy     from 'rollup-plugin-copy';
 // import rollupPluginES6ClassMinify from 'rollup-plugin-es6-class-minify';
 
 // const es6ClassMinify = rollupPluginES6ClassMinify()
@@ -45,7 +46,12 @@ export default {
         // urlResolve()
         // terser()
         resolve(),
-        commonjs()
+        commonjs(),
+        copy({
+            targets: [
+                { src: 'index.html', dest: './public' }
+            ]
+        })
     ],
     input: 'main.js',
     output: {
