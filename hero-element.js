@@ -11,7 +11,7 @@ const keyboardNavigation = {
 
 // possibly extract out reusable code to a base element MyBaseElement extends HTMLElement
 // attaching shadow dom might be good candidate for base element
-class MyHeroExperience extends HTMLElement {
+export default class MyHeroExperience extends HTMLElement {
 
     constructor (el) {
         console.log('what did you construct ', el)
@@ -674,5 +674,3 @@ class MyHeroExperience extends HTMLElement {
 }
 
 window.customElements.define('my-hero-experience', MyHeroExperience);
-
-export { MyHeroExperience }

@@ -1,5 +1,4 @@
-import { MyHeroExperienceElement } from 'hero-element';
-// import MyHeroExperienceElement from 'hero-element.js';
+import MyHeroExperience from './hero-element.js';
 import html from 'snabby';
 
 let currentVnode;
@@ -143,4 +142,4 @@ view();
 // we could also try to inject the hero experienece instead of creating it in the view...
 // stage a hero element and inject the custom experience into that.
 
-MyHeroExperienceElement.registerCustomModule();
+MyHeroExperience.registerCustomModule();
