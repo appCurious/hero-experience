@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rollup -c rollup.config.js --compact",
-    "start": "node server"
+    "build": "rollup -c rollup.config.js --compact"
   },
   "keywords": [
     "hero",
