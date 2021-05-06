@@ -1,38 +1,13 @@
 
 
-// import html from 'snabby';
-import html from 'https://cdn.skypack.dev/snabby?min';
+import html from 'snabby';
+// import html from 'https://cdn.skypack.dev/snabby?min';
+import widgetFiveZones from './widgets/five-zone.js';
 
 const _delimiter = ';';
 const keyboardNavigation = {
     
 };
-function mockTable (items = []) {
-    console.log('mockTable ', items)
-    const buildHeader = (item) => {
-        console.log('what is the item for a header ', item)
-        return html`<th>Product-${item.widgetId}</th>`;
-    }
-
-    const buildTableBody = () => {
-        let headers = [];
-        const body = items.map((d) => {
-            headers.push(buildHeader(d));
-            console.log('what is my header ', headers)
-            return html`<td> we could use ${d.description} in our lives </td>`;
-        });
-
-        return html`<table>
-            <tr>${headers}</tr>
-            <tr>${body}</tr>
-        </table>
-        `;
-    };
-
-    return html`<div>
-        ${buildTableBody()}
-    </div>`;
-}
 
 // possibly extract out reusable code to a base element MyBaseElement extends HTMLElement
 // attaching shadow dom might be good candidate for base element
@@ -477,7 +452,26 @@ export default class MyHeroExperience extends HTMLElement {
         const leftHidden = '-200px';
         
 
-        this.#_model.items = [{widgetId:1, type: 'InteractiveTour', description: "music"},{widgetId:2, type: 'ImageGallery', description: "art"},{widgetId:3, type: 'DocumentGallery', description: "code"}];
+        this.#_model.items = [
+            {widgetId:1, type: 'InteractiveTour', description: "music", items: [
+                    {widgetId:1, type: 'InteractiveTour', description: "music"},
+                    {widgetId:2, type: 'ImageGallery', description: "art"},
+                    {widgetId:3, type: 'DocumentGallery', description: "code"}
+                ]
+            },
+            {widgetId:2, type: 'ImageGallery', description: "art", items: [
+                    {widgetId:1, type: 'InteractiveTour', description: "parks"},
+                    {widgetId:2, type: 'ImageGallery', description: "and"},
+                    {widgetId:3, type: 'DocumentGallery', description: "recreation"}
+                ]
+            },
+            {widgetId:3, type: 'DocumentGallery', description: "code", items: [
+                    {widgetId:1, type: 'InteractiveTour', description: "rest"},
+                    {widgetId:2, type: 'ImageGallery', description: "excercise"},
+                    {widgetId:3, type: 'DocumentGallery', description: "peace"}
+                ]
+            }
+        ];
         const itemsWidth = `${this.#_model.items.length * 50}px`;// '150px';
 
         const _setElementFocus = (selector) => {
@@ -558,7 +552,7 @@ export default class MyHeroExperience extends HTMLElement {
             this.#_model.displayItem = itemId;
             this.#_update();
 
-            _setElementFocus(`#my-custom-element-4567896878787-${itemId}`);
+            // _setElementFocus(`#my-custom-element-4567896878787-${itemId}`);
 
         };
 
@@ -585,10 +579,15 @@ export default class MyHeroExperience extends HTMLElement {
 
             let transitionClass = ' my-custom-element--item-view-expands-';
             transitionClass += this.#_model.canExpandWidth && this.#_model.canExpandHeight ? 'height-width' : this.#_model.canExpandHeight ? 'height' : this.#_model.canExpandWidth ? 'width' : 'false';
+
+            const widgetModel = this.#_model.items.find((el) => el.widgetId === this.#_model.displayItem);
             
+            // removing this to be able to tab through the widget area - still need a way back to the clickable ribbon item
+            // @on:keydown="${ (ev) => _navigateToRibbonItem(ev, navigationSelector) }"
+            // removed tab index from div my-custom-element-456....
             return html`<div id="my-custom-element-4567896878787-${this.#_model.displayItem}" class="my-custom-element--item-view${this.#_model.isFullscreen ? ' fullscreen' : ''}${transitionClass}"
-                tabindex="0"
-                @attrs:aria-label="viewing ${(this.#_model.items.find((el) => el.widgetId === this.#_model.displayItem)).type}product information"
+
+                @attrs:aria-label="viewing ${widgetModel.type}product information"
                 @key="my-custom-element-4567896878787-${this.#_model.displayItem}"
                 @style:width="${!this.#_model.isFullscreen && this.#_model.canExpandWidth ? 'auto' : '100%'}"
                 @style:height="${!this.#_model.isFullscreen && this.#_model.canExpandHeight ? 'auto' : '100%' }"
@@ -600,28 +599,13 @@ export default class MyHeroExperience extends HTMLElement {
                     
                         <button class="my-custom-element-fullscreen-button"
                             @attrs:aria-label="${this.#_model.isFullscreen ? 'clickable close fullscreen' : 'clickable open fullscreen'}"
-                            @on:click="${_toggleItemFullScreen}"
-                            @on:keydown="${ (ev) => _navigateToRibbonItem(ev, navigationSelector) }">
+                            @on:click="${_toggleItemFullScreen}">
                         </button>
                         fullscreen
                     </div>
                 </div>
 
-                <div class="my-custom-element--center"
-
-                >
-                    <div class="my-custom-element--center my-custom-element--item"
-                    
-                        @style:height="1000px"
-                        @style:width="1000px">
-                        <div>${this.#_model.displayItem}-Center-${this.#_model.displayItem}</div>
-                        ${mockTable(this.#_model.items)}
-                    </div>
-                </div>
-                <div class="my-custom-element-col-2">
-                    <div class="my-custom-element--bottom-left my-custom-element--item">Bottom Left</div>
-                    <div class="my-custom-element--bottom-right my-custom-element--item">Bottom Right</div>
-                </div>
+                ${widgetFiveZones.view(widgetModel)}
             </div>`;
         };
 

@@ -8,11 +8,11 @@ export default {
         // terser()
         resolve()
     ],
-    input: 'hero-element.js',
+    input: 'main.js',
     output: {
-        file: './dist/myhero.js',
+        file: './public/myhero.js',
         name: 'MyHeroElement',
-        format: 'iife'
+        format: 'cjs'
         // format: 'es'
         // format: 'umd'
         // format: 'cjs'
