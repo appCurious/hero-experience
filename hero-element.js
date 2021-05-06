@@ -11,7 +11,7 @@ const keyboardNavigation = {
 
 // possibly extract out reusable code to a base element MyBaseElement extends HTMLElement
 // attaching shadow dom might be good candidate for base element
-export default class MyHeroExperience extends HTMLElement {
+class MyHeroExperience extends HTMLElement {
 
     constructor (el) {
         console.log('what did you construct ', el)
@@ -29,36 +29,36 @@ export default class MyHeroExperience extends HTMLElement {
 
     // private properties
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Private_class_fields
-    #_model = undefined;
-    #_documentMutationObserver = undefined;
+    _model = undefined;
+    _documentMutationObserver = undefined;
 
     // public methods first
     
     destroyExperience () {
-        this.#_destroy ();
+        this._destroy ();
     }
 
     resetExperience (productid) {
-        this.#_model = this.#_init({productid: productid || ''});
+        this._model = this._init({productid: productid || ''});
     }
 
     changeExperienceSelectors () {
         console.log('called change experience selectors')
-        if (this.#_model) {
-            this.#_setupHeroReference(this.#_model);
+        if (this._model) {
+            this._setupHeroReference(this._model);
         }
     }
 
     dynamicallyChangeSelectors () {
         console.log('setup dynamic selectors')
-        if (!this.#_documentMutationObserver) {
+        if (!this._documentMutationObserver) {
 
-            this.#_documentMutationObserver = new MutationObserver((record,observer) => {
+            this._documentMutationObserver = new MutationObserver((record,observer) => {
                 console.log('doc was mutated');
                 this.changeExperienceSelectors();
             });
 
-            this.#_documentMutationObserver.observe(document.body, { childList: true, subtree: true } );
+            this._documentMutationObserver.observe(document.body, { childList: true, subtree: true } );
         }
     }
 
@@ -66,8 +66,8 @@ export default class MyHeroExperience extends HTMLElement {
         console.log('we are connected');
         // TODO in the event we need my data - we may not have it passed into the constructor
         // maybe a function on my.getHeroData or something used by the init function would work
-        // this.#_model = this.#_init(this.#_model);
-        // this.#_update();
+        // this._model = this._init(this._model);
+        // this._update();
     }
     
     attributeChangedCallback (name, oldValue, newValue) {
@@ -75,12 +75,12 @@ export default class MyHeroExperience extends HTMLElement {
 
         if (name === 'product-id') {
             console.log('would we change hero data for product-id ', newValue);
-            if (newValue) this.#_model = this.#_init({productid: newValue});
+            if (newValue) this._model = this._init({productid: newValue});
             // not sure if we should do something else
             
         }
 
-        this.#_update();
+        this._update();
     }
 
     static get observedAttributes () { return [ 'product-id', 'ec-json', 'hero-reference-selectors' ]; }
@@ -89,18 +89,18 @@ export default class MyHeroExperience extends HTMLElement {
 
 
     // private methods after public methods
-    #_getMyHero (id) {
-        return document.querySelector(`my-hero-experience[product-id="${id || this.#_model.productid}"]`);
+    _getMyHero (id) {
+        return document.querySelector(`my-hero-experience[product-id="${id || this._model.productid}"]`);
     }
 
-    #_update () {
-        const newVnode = this.#_view(this.#_model, () => this.#_update());
+    _update () {
+        const newVnode = this._view(this._model, () => this._update());
         this.currentVnode = html.update(this.currentVnode, newVnode);
     }
 
-    #_setupHeroReference(model, heroReferenceSelectors) {
+    _setupHeroReference(model, heroReferenceSelectors) {
 
-        const myHero = this.#_getMyHero(model.productid);
+        const myHero = this._getMyHero(model.productid);
         if (!myHero) return console.log('no hero in setupHeroReference');
 
         model.heroReferenceSelectors = heroReferenceSelectors ? heroReferenceSelectors : model.heroReferenceSelectors ? model.heroReferenceSelectors : '';
@@ -111,9 +111,9 @@ export default class MyHeroExperience extends HTMLElement {
         const _updateHeroSizing = (selector) => {
             const heroReference = document.querySelector(selector);
             if (!heroReference) {
-                // this.#_model = this.#_init(this.#_model);
-                // this.#_setupHeroReference(this.#_model.heroReferenceSelectors);
-                this.#_setupHeroReference(this.#_model);
+                // this._model = this._init(this._model);
+                // this._setupHeroReference(this._model.heroReferenceSelectors);
+                this._setupHeroReference(this._model);
                 
                 return;
             }
@@ -129,9 +129,9 @@ export default class MyHeroExperience extends HTMLElement {
             // the other targets may have been removed replaced in the dom
             // start again
             if (!rect) {
-                // this.#_model = this.#_init(this.#_model);
-                // this.#_setupHeroReference(this.#_model.heroReferenceSelectors);
-                this.#_setupHeroReference(this.#_model);
+                // this._model = this._init(this._model);
+                // this._setupHeroReference(this._model.heroReferenceSelectors);
+                this._setupHeroReference(this._model);
                 
                 return;
             }
@@ -149,7 +149,7 @@ export default class MyHeroExperience extends HTMLElement {
             myHero.style['max-height'] = `${rect.height}px`;
             myHero.style['z-index'] = model.fullscreenZindex;
             
-            this.#_model.displayWidth = rect.width;
+            this._model.displayWidth = rect.width;
 
             // record reset styles to apply after fullscreen
             model.resetStyles = {
@@ -215,13 +215,13 @@ export default class MyHeroExperience extends HTMLElement {
         }
     }
 
-    #_init (configs) {
+    _init (configs) {
         console.log('initialized', configs);
         // initialize ribbon or hotspots or modal
         // would return that model instead
         // return experience.init(configs);
 
-        const myHero = this.#_getMyHero(configs.productid);
+        const myHero = this._getMyHero(configs.productid);
         const model = {
             productid: configs.productid,
             observers: {},
@@ -258,17 +258,17 @@ export default class MyHeroExperience extends HTMLElement {
                 this.dynamicallyChangeSelectors();
             }
 
-            this.#_setupHeroReference( model,  myHero.getAttribute('hero-reference-selectors') );
+            this._setupHeroReference( model,  myHero.getAttribute('hero-reference-selectors') );
 
         }
 
         return  model;
     }
 
-    #_view (model) {
+    _view (model) {
         console.log('view called');
         // might do some logic in the init function or attributeChanged to discover which experience ribbon, hotspots, modal
-        // return experience.view(this.#_model, this._update);
+        // return experience.view(this._model, this._update);
         const style = `
             :host {
                 display: block;
@@ -452,7 +452,7 @@ export default class MyHeroExperience extends HTMLElement {
         const leftHidden = '-200px';
         
 
-        this.#_model.items = [
+        this._model.items = [
             {widgetId:1, type: 'InteractiveTour', description: "music", items: [
                     {widgetId:1, type: 'InteractiveTour', description: "music"},
                     {widgetId:2, type: 'ImageGallery', description: "art"},
@@ -472,7 +472,7 @@ export default class MyHeroExperience extends HTMLElement {
                 ]
             }
         ];
-        const itemsWidth = `${this.#_model.items.length * 50}px`;// '150px';
+        const itemsWidth = `${this._model.items.length * 50}px`;// '150px';
 
         const _setElementFocus = (selector) => {
             const elem = this.shadowRoot.querySelector(selector);
@@ -502,16 +502,16 @@ export default class MyHeroExperience extends HTMLElement {
         const _createRibbonItems = () => {
             let tabIndex = 0;
 
-            return this.#_model.items.map((item) => {
+            return this._model.items.map((item) => {
                 tabIndex++;
-                const isSelected = this.#_model.displayItem === item.widgetId;
-                const isLast = tabIndex === this.#_model.items.length;
+                const isSelected = this._model.displayItem === item.widgetId;
+                const isLast = tabIndex === this._model.items.length;
                 const detailSelector = `#my-custom-element-4567896878787-${item.widgetId}`;
 
                 return html`<div class="my-custom-element--item ${isSelected ? 'selected' : ''}">
                     <button id="my-custom-element-4567896878787-ribbon-item-${item.widgetId}"
-                        @attrs:aria-hidden="${!this.#_model.ribbonVisible}"
-                        @attrs:tabindex="${!this.#_model.ribbonVisible ? '-1': '0'}"
+                        @attrs:aria-hidden="${!this._model.ribbonVisible}"
+                        @attrs:tabindex="${!this._model.ribbonVisible ? '-1': '0'}"
                         @attrs:aria-label="clickable product ${item.type}"
                         @on:click="${() => _toggleDisplayItem(item.widgetId)}"
                         @on:keydown="${ isLast && !isSelected ? (ev) => _navigateToRibbonItem( ev, '.my-ribbon-icon button' ) : '' }">
@@ -523,74 +523,74 @@ export default class MyHeroExperience extends HTMLElement {
 
         const _toggleRibbon = () => {
             console.log('my toggle')
-            this.#_model.ribbonVisible = !this.#_model.ribbonVisible;
+            this._model.ribbonVisible = !this._model.ribbonVisible;
 
             // bubble toggle event
             const icon = this.shadowRoot.querySelector('.my-ribbon-icon');
             // testing the difference between composed true | false
             // icon.dispatchEvent(new Event('toggle-ribbon-display', {bubbles: true, composed: false}));
             // icon.dispatchEvent(new Event('toggle-ribbon-display', {bubbles: true, composed: true}));
-            const eventDetail = `ribbon items are ${ this.#_model.ribbonVisible ? 'viewing' : 'hidding'}`;
+            const eventDetail = `ribbon items are ${ this._model.ribbonVisible ? 'viewing' : 'hidding'}`;
             icon.dispatchEvent(new CustomEvent('toggle-ribbon-display', { bubbles: true, composed: true, detail: eventDetail }));
 
-            if (this.#_model.isFullscreen) _toggleItemFullScreen();
+            if (this._model.isFullscreen) _toggleItemFullScreen();
 
-            if (!this.#_model.ribbonVisible) return _closeItem();
+            if (!this._model.ribbonVisible) return _closeItem();
 
-            this.#_update();
+            this._update();
         };
 
         const _toggleDisplayItem = (itemId) => {
             // we would go get the model item and corresponding widget display
             // but here we are going to take up the space given to us
             console.log('my display item')
-            if (itemId === this.#_model.displayItem) {
+            if (itemId === this._model.displayItem) {
                 return _closeItem();
             }
 
             _closeItem();
-            this.#_model.displayItem = itemId;
-            this.#_update();
+            this._model.displayItem = itemId;
+            this._update();
 
             // _setElementFocus(`#my-custom-element-4567896878787-${itemId}`);
 
         };
 
         const _toggleItemFullScreen = () => {
-            this.#_model.isFullscreen = !this.#_model.isFullscreen;
-            this.#_viewFullScreen();
+            this._model.isFullscreen = !this._model.isFullscreen;
+            this._viewFullScreen();
 
-            this.#_update();
+            this._update();
         };
 
         const _closeItem = () => {
-            // report if you will this.#_model.displayItem
-            this.#_model.displayItem = null;
-            this.#_update();
+            // report if you will this._model.displayItem
+            this._model.displayItem = null;
+            this._update();
         };
 
 /** @attrs:role="button"
-                    @attr:aria-pressed="${this.#_model.isFullscreen}" */
+                    @attr:aria-pressed="${this._model.isFullscreen}" */
 
         const _renderItem = () => {
-            // would take this.#_model.displayItem and its data to display
+            // would take this._model.displayItem and its data to display
             // look up and instantiate
-            const navigationSelector = `#my-custom-element-4567896878787-ribbon-item-${this.#_model.displayItem}`;
+            const navigationSelector = `#my-custom-element-4567896878787-ribbon-item-${this._model.displayItem}`;
 
             let transitionClass = ' my-custom-element--item-view-expands-';
-            transitionClass += this.#_model.canExpandWidth && this.#_model.canExpandHeight ? 'height-width' : this.#_model.canExpandHeight ? 'height' : this.#_model.canExpandWidth ? 'width' : 'false';
+            transitionClass += this._model.canExpandWidth && this._model.canExpandHeight ? 'height-width' : this._model.canExpandHeight ? 'height' : this._model.canExpandWidth ? 'width' : 'false';
 
-            const widgetModel = this.#_model.items.find((el) => el.widgetId === this.#_model.displayItem);
+            const widgetModel = this._model.items.find((el) => el.widgetId === this._model.displayItem);
             
             // removing this to be able to tab through the widget area - still need a way back to the clickable ribbon item
             // @on:keydown="${ (ev) => _navigateToRibbonItem(ev, navigationSelector) }"
             // removed tab index from div my-custom-element-456....
-            return html`<div id="my-custom-element-4567896878787-${this.#_model.displayItem}" class="my-custom-element--item-view${this.#_model.isFullscreen ? ' fullscreen' : ''}${transitionClass}"
+            return html`<div id="my-custom-element-4567896878787-${this._model.displayItem}" class="my-custom-element--item-view${this._model.isFullscreen ? ' fullscreen' : ''}${transitionClass}"
 
                 @attrs:aria-label="viewing ${widgetModel.type}product information"
-                @key="my-custom-element-4567896878787-${this.#_model.displayItem}"
-                @style:width="${!this.#_model.isFullscreen && this.#_model.canExpandWidth ? 'auto' : '100%'}"
-                @style:height="${!this.#_model.isFullscreen && this.#_model.canExpandHeight ? 'auto' : '100%' }"
+                @key="my-custom-element-4567896878787-${this._model.displayItem}"
+                @style:width="${!this._model.isFullscreen && this._model.canExpandWidth ? 'auto' : '100%'}"
+                @style:height="${!this._model.isFullscreen && this._model.canExpandHeight ? 'auto' : '100%' }"
                 @style:transition="height 1.5s ease, width 1.7s ease;">
 
                 <div class="my-custom-element-col-2">
@@ -598,7 +598,7 @@ export default class MyHeroExperience extends HTMLElement {
                     <div class="my-custom-element--top-right my-custom-element--item">
                     
                         <button class="my-custom-element-fullscreen-button"
-                            @attrs:aria-label="${this.#_model.isFullscreen ? 'clickable close fullscreen' : 'clickable open fullscreen'}"
+                            @attrs:aria-label="${this._model.isFullscreen ? 'clickable close fullscreen' : 'clickable open fullscreen'}"
                             @on:click="${_toggleItemFullScreen}">
                         </button>
                         fullscreen
@@ -611,31 +611,31 @@ export default class MyHeroExperience extends HTMLElement {
 
         
         /**@attrs:role="button"
-                        @attr:aria-pressed="${this.#_model.ribbonVisible}"
-                         @attrs:aria-hidden="${!this.#_model.ribbonVisible}"
+                        @attr:aria-pressed="${this._model.ribbonVisible}"
+                         @attrs:aria-hidden="${!this._model.ribbonVisible}"
                         */
 
         // try to render in html tab order - moving to item render
-        // ${this.#_model.displayItem ? _renderItem() : ''}
+        // ${this._model.displayItem ? _renderItem() : ''}
         
         return html`
-            <div class="my-custom-element ${this.#_model.isFullscreen ? 'my-custom-element-fullscreen' : ''}">
+            <div class="my-custom-element ${this._model.isFullscreen ? 'my-custom-element-fullscreen' : ''}">
                 <style>${style}</style>
                 <div class="my-custom-element-overlay"
-                    @style:display="${this.#_model.displayItem && !this.#_model.isFullscreen? '' : 'none'}"></div>
+                    @style:display="${this._model.displayItem && !this._model.isFullscreen? '' : 'none'}"></div>
                 <slot id="my-custom-element-slot-hero" name="my-hero-container-top"></slot>
                 <div class="my-ribbon"
-                    @style:width="${this.#_model.ribbonVisible ? itemsWidth : collapsedWidth}">
+                    @style:width="${this._model.ribbonVisible ? itemsWidth : collapsedWidth}">
                     <div class="my-ribbon-icon">
                         <button
-                            @attrs:aria-label="clickable item list${this.#_model.ribbonVisible ? ' open' : ' closed'}"
+                            @attrs:aria-label="clickable item list${this._model.ribbonVisible ? ' open' : ' closed'}"
                             @on:click="${_toggleRibbon}">
                         </button>
                     </div>
                     
                     <div class="my-ribbon-items"
-                        @style:left="${this.#_model.ribbonVisible ? leftDisplay : leftHidden }"
-                        @style:width="${this.#_model.ribbonVisible ? itemsWidth : '0px'}">
+                        @style:left="${this._model.ribbonVisible ? leftDisplay : leftHidden }"
+                        @style:width="${this._model.ribbonVisible ? itemsWidth : '0px'}">
                         ${_createRibbonItems()}
                     </div>
                 
@@ -646,12 +646,12 @@ export default class MyHeroExperience extends HTMLElement {
         `;
     }
 
-    #_viewFullScreen () {
-        const myHero = this.#_getMyHero();
+    _viewFullScreen () {
+        const myHero = this._getMyHero();
 
         if (myHero) {
-            if ( this.#_model.isFullscreen) {
-                myHero.style.position = this.#_model.fullscreenPosition; //'absolute';
+            if ( this._model.isFullscreen) {
+                myHero.style.position = this._model.fullscreenPosition; //'absolute';
                 myHero.style.width = '100%';
                 myHero.style.height = '100%';
                 myHero.style['max-width'] = '100%',
@@ -659,18 +659,20 @@ export default class MyHeroExperience extends HTMLElement {
                 myHero.style.top = '0';
                 myHero.style.left = '0';
             } else {
-                Object.keys(this.#_model.resetStyles).forEach((s) => {
-                    myHero.style[s] = this.#_model.resetStyles[s];
+                Object.keys(this._model.resetStyles).forEach((s) => {
+                    myHero.style[s] = this._model.resetStyles[s];
                 });
             }
             
         }
     }
 
-    #_destroy () {
-        // destroyObservers(this.#_model);
-        this.#_model = null;
+    _destroy () {
+        // destroyObservers(this._model);
+        this._model = null;
     }
 }
 
 window.customElements.define('my-hero-experience', MyHeroExperience);
+
+export { MyHeroExperience }

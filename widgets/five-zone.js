@@ -1,5 +1,5 @@
-// import html from 'snabby';
-import html from 'https://cdn.skypack.dev/snabby?min';
+import html from 'snabby';
+// import html from 'https://cdn.skypack.dev/snabby?min';
 
 const style = `
     .button {

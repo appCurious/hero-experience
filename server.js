@@ -13,6 +13,10 @@ app.get('/', function(req, res) {
 	res.sendFile(__dirname + '/index.html');
 });
 
+app.get('/test', function (req, res) {
+	res.sendFile(__dirname + '/test.html');
+});
+
 app.get('/my-hero', function (req, res) {
 	console.log('requesting hero js')
 	res.sendFile(__dirname + '/hero-element.js');
