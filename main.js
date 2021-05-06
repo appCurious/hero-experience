@@ -144,5 +144,3 @@ view();
 // stage a hero element and inject the custom experience into that.
 
 MyHeroExperienceElement.registerCustomModule();
-
-export { MyHeroExperienceElement, renderApp }
