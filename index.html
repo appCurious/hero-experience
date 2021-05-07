@@ -7,9 +7,17 @@
         }
         .page-header,
         .page-footer {
-            height: 100px;
-            width: 100%;
+            height: auto;
+            min-height: 130px;
             background-color: blue;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        .instructions {
+            color: white;
+            width: 100%;
+            margin-left: 10px;
         }
 
         button:focus {
@@ -75,6 +83,7 @@
 <body>
     <div class="app">
         <div class="page-header">
+            <div class="instructions">Waiting for Instructions</div>
             <button class="menu-button"
                 aria-label="clickable menu">
                 Menu Button

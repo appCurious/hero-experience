@@ -22,6 +22,7 @@
     "@rollup/plugin-node-resolve": "^10.0.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "lodash": "^4.17.21",
     "openssl": "^1.1.0",
     "rollup": "^2.44.0",
     "rollup-plugin-copy": "^3.4.0",

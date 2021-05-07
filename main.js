@@ -1,147 +1,69 @@
 import MyHeroElement from './hero-element.js';
 import html from 'snabby';
 
-let currentVnode = document.querySelector('.app');
-let model;
+let currentVnode = document.querySelector('.page-header .instructions');
+
+const model =  MyHeroElement.getFocusControlModel();
+
 const update = () => {
     const newVnode = view(model, update);
     currentVnode = html.update(currentVnode, newVnode);
 }
 
-const view = (model, update) => {
-    return  renderApp();
-}
+function createInstructions () {
+    const _changedFocusControl = (ev) => {
+        const val = ev.target.value || 'partialcontrol';
+        model.focusControlSelected = val;
+        MyHeroElement.setFocusControl(val);
 
-function renderApp () {
-    const style = `
-        .app {
-            background-color: brown;
-        }
-        .page-header,
-        .page-footer {
-            height: 100px;
-            width: 100%;
-            background-color: blue;
-        }
+        update();
+    };
 
-        button:focus {
-            outline: solid 8px brown;
-        }
-        .reference-clickables button:focus {
-            outline-color: blue;
-        }
-        .menu-button {
-            margin: 10px;
-        }
+    const _buildInstructions = () => {
+       
 
-        .main-content {
-            width: 100%;
-        }
-        .hero-image-container {
-            display: flex;
-            height: 500px;
-            width: 500px;
-            background-color: yellow;
-        }
-        .hero-thumbs {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-evenly;
-            align-items: center;
-            height: 100%;
-            width: 100px;
-            background-color: blue;
-        }
-        .hero-thumb {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 50px;
-            width: 50px;
-            background: yellow;
-        }
-        .hero-image {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            width: 400px;
-            background-color: green;
-        }
+        /**<option selected="${model.focusControlSelected === 'fullcontrol'}" value="fullcontrol">Full Focus Control</option>
+            <option selected="${model.focusControlSelected === 'nocontrol'}" value="nocontrol">HTML Navigation Only</option>
+            <option selected="${model.focusControlSelected === 'partialcontrol'}" value="partialcontrol">Some Focus Control</option> */
 
-        my-hero-experience.my-hero-parent {
-            position: relative;
-            position: fixed;
-            position: absolute;
+        console.log('what is my model ', model)
+        return model.selections.reduce((acc, option) => {
+            acc.options.push (html`
+                <option selected="${model.focusControlSelected === option.value}" value="${option.value}">${option.displayText}</option>
+            `);
             
-            
-            height: 100%;
-            width: 100%;
-            /*height: inherit;*/
-            /*width: inherit;*/
-            
-            z-index: 20;
-        }
-    `;
+            acc.descriptions.push(html`
+                <p 
+                    @style:display="${model.focusControlSelected === option.value ? '' : 'none'}">
+                    ${option.description}
+                </p>`
+            );
 
-    return html`<div class="app">
-        <style>${style}</style>
-        <div class="page-header">
-            <button class="menu-button"
-                aria-label="clickable menu">
-                Menu Button
-            </button>
-        </div>
-        <my-hero-experience
-            aria-label="product image details"
-            class="my-hero-parent" 
-            product-id="123" 
-            fullscreen-position="fixed" 
-            fullscreen-zindex="20012" 
-            can-expand-height="true" 
-            can-expand-width="true"
-            hero-reference-selectors=".hero-image"
-
-            style="overflow: visible;">
-        </my-hero-experience>
-        <div class="main-content">
-            <div class="hero-image-container">
-                <div class="hero-thumbs">
-                    <div class="hero-thumb">image</div>
-                    <div class="hero-thumb">image</div>
-                    <div class="hero-thumb">image</div>
-                </div>
-                <div class="hero-image">image</div>
-            </div>
+            return acc;
             
-        </div>
-        <div class="reference-clickables">
-            <button class="menu-button" aria-label="ref 1">Product Reference</button>
-            <button class="menu-button" aria-label="ref 2">Product Reference</button>
-            <button class="menu-button" aria-label="ref 3">Product Reference</button>
-        </div>
-        <div>
-            <p>Just some text and some more controls to see if tab gets here.  
-                Not sure what is happening in the real situation but using snabby 
-                it is not tabbing into the children div elemnts
+        }, { options: [], descriptions: [] });
+    };
 
-            </p>
-            <div class="reference-clickables">
-                <button class="menu-button" aria-label="ref 4">Reviews</button>
-                <button class="menu-button" aria-label="ref 5">Reviews</button>
-                <button class="menu-button" aria-label="ref 6">Reviews</button>
-            </div>
-        </div>
-        <div class="page-footer"></div>                
+    const instructions = _buildInstructions();
+
+    return html`<div class="instructions">
+        <p>Select a Focus Control.  Then Review Keyboard Navigation and Keyboard Controls</p>
+        <select value="${model.focusControlSelected}"
+            @on:change="${(ev) => _changedFocusControl(ev)}">
+            ${ instructions.options }
+        </select>
+        ${instructions.descriptions}
     </div>`;
+
 }
 
 
 
-// update();
-// we could also try to inject the hero experienece instead of creating it in the view...
-// stage a hero element and inject the custom experience into that.
+const view = (model, update) => {
+    return  createInstructions();
+}
 
-// MyHeroElement.registerCustomModule();
+
+update();
 
 

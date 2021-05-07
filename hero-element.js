@@ -1,6 +1,7 @@
 
 
 import html from 'snabby';
+
 // import html from 'https://cdn.skypack.dev/snabby?min';
 import widgetFiveZones from './widgets/five-zone.js';
 
@@ -9,9 +10,20 @@ const keyboardNavigation = {
     
 };
 
+const focusControlModel = {
+    selections: [
+        { value: 'fullcontrol', displayText: 'Full Focus Trap', description: 'We will control element focus by passing a navigation object to all participants.  It is the participating scripts job to identify the last control and use the navigation.'},
+        { value: 'nocontrol', displayText: 'Only HTML Natural Navigation', description: 'No Focus Trap will be used at all.' },
+        { value: 'partialcontrol', displayText: 'Some Focus Control', description: 'Ribbon is considered a modal and will loop from last element to first, HOWEVER the control will not be passed to the widget' }
+    ],
+    focusControlSelected: 'partialcontrol',
+};
+
+let focusControlSelected = 'partialcontrol';
+
 // possibly extract out reusable code to a base element MyBaseElement extends HTMLElement
 // attaching shadow dom might be good candidate for base element
-class MyHeroElement extends HTMLElement {
+export default class MyHeroElement extends HTMLElement {
 
     constructor (el) {
         console.log('what did you construct ', el)
@@ -22,7 +34,6 @@ class MyHeroElement extends HTMLElement {
         const d = document.createElement('div');
         this.currentVnode = d;
         this.shadowRoot.appendChild(d);
-
     }
 
     // public properties
@@ -86,6 +97,14 @@ class MyHeroElement extends HTMLElement {
     static get observedAttributes () { return [ 'product-id', 'ec-json', 'hero-reference-selectors' ]; }
 
     static registerCustomModule () { !customElements.get('my-hero-experience') ? window.customElements.define('my-hero-experience', MyHeroElement) : ''; }
+
+    static setFocusControl (setting) { 
+        focusControlSelected = setting;
+        console.log('setting came in ', setting, ' setting set ', focusControlSelected);
+        if (this._model) this._update();
+    }
+
+    static getFocusControlModel () { return focusControlModel; }
 
 
     // private methods after public methods
@@ -267,7 +286,29 @@ class MyHeroElement extends HTMLElement {
     }
 
     _view (model) {
-        console.log('view called');
+        const _setElementFocus = (selector) => {
+            const elem = this.shadowRoot.querySelector(selector);
+            console.log('what is elem ', elem, selector)
+            if (elem != null) elem.focus();
+        };
+
+        /**
+         * 
+         * @param {kepress event} ev 
+         * @param {widgetId} itemId 
+         * Based on https://webaim.org/techniques/keyboard/  accessibility keyboard navigation
+         * this function sets focus on the identified ribbon item
+         * this would include setting the focus on the the ribbon icon ( clickable ribbon expand button ) when the last element is tabbed awayfrom
+         */
+        const _navigateToRibbonItem = (ev, selector) => {
+            console.log('keypress ',ev, ' for  ', selector)
+            // ev.preventDefault();
+            if (ev.key === 'Tab' && !ev.shiftKey) {
+                ev.preventDefault();
+                _setElementFocus(selector);
+            }
+        };
+
         // might do some logic in the init function or attributeChanged to discover which experience ribbon, hotspots, modal
         // return experience.view(this._model, this._update);
         const style = `
@@ -452,51 +493,35 @@ class MyHeroElement extends HTMLElement {
         const leftDisplay = '64px';
         const leftHidden = '-200px';
         
+        const _widgetNavigation = (ev) => {
+            console.log('widget nav ', ev)
+            _navigateToRibbonItem(ev, '.my-custom-element .my-ribbon .my-ribbon-items .my-custom-element--item.selected button');
+        };
 
         this._model.items = [
             {widgetId:1, type: 'InteractiveTour', description: "music", items: [
                     {widgetId:1, type: 'InteractiveTour', description: "music"},
                     {widgetId:2, type: 'ImageGallery', description: "art"},
                     {widgetId:3, type: 'DocumentGallery', description: "code"}
-                ]
+                ],
+                navigationController: focusControlSelected === 'fullcontrol' ? (ev) =>  _widgetNavigation(ev) : ''
             },
             {widgetId:2, type: 'ImageGallery', description: "art", items: [
                     {widgetId:1, type: 'InteractiveTour', description: "parks"},
                     {widgetId:2, type: 'ImageGallery', description: "and"},
                     {widgetId:3, type: 'DocumentGallery', description: "recreation"}
-                ]
+                ],
+                navigationController: focusControlSelected === 'fullcontrol' ? (ev) => _widgetNavigation(ev) : ''
             },
             {widgetId:3, type: 'DocumentGallery', description: "code", items: [
                     {widgetId:1, type: 'InteractiveTour', description: "rest"},
                     {widgetId:2, type: 'ImageGallery', description: "excercise"},
                     {widgetId:3, type: 'DocumentGallery', description: "peace"}
-                ]
+                ],
+                navigationController: focusControlSelected === 'fullcontrol' ? (ev) => _widgetNavigation(ev) : ''
             }
         ];
-        const itemsWidth = `${this._model.items.length * 50}px`;// '150px';
-
-        const _setElementFocus = (selector) => {
-            const elem = this.shadowRoot.querySelector(selector);
-            console.log('what is elem ', elem, selector)
-            if (elem != null) elem.focus();
-        };
-
-        /**
-         * 
-         * @param {kepress event} ev 
-         * @param {widgetId} itemId 
-         * Based on https://webaim.org/techniques/keyboard/  accessibility keyboard navigation
-         * this function sets focus on the identified ribbon item
-         * this would include setting the focus on the the ribbon icon ( clickable ribbon expand button ) when the last element is tabbed awayfrom
-         */
-        const _navigateToRibbonItem = (ev, selector) => {
-            console.log('keypress ',ev, ' for  ', selector)
-            // ev.preventDefault();
-            if (ev.key === 'Tab') {
-                ev.preventDefault();
-                _setElementFocus(selector);
-            }
-        };
+        const itemsWidth = `${this._model.items.length * 50}px`;// '150px';        
     
         // @on:keydown="${ isLast && !isSelected ? (ev) => _navigateToRibbonItem( ev, '.my-ribbon-icon button' ) : 
         // isSelected ? (ev) => _navigateToRibbonItem(ev, detailSelector) : '' }">
@@ -515,7 +540,7 @@ class MyHeroElement extends HTMLElement {
                         @attrs:tabindex="${!this._model.ribbonVisible ? '-1': '0'}"
                         @attrs:aria-label="clickable product ${item.type}"
                         @on:click="${() => _toggleDisplayItem(item.widgetId)}"
-                        @on:keydown="${ isLast && !isSelected ? (ev) => _navigateToRibbonItem( ev, '.my-ribbon-icon button' ) : '' }">
+                        @on:keydown="${ focusControlSelected !== 'nocontrol' ? isLast && !isSelected ? (ev) => _navigateToRibbonItem( ev, '.my-ribbon-icon button' ) : '' : '' }">
                     </button>
                     ${isSelected ? _renderItem() : ''}
                 </div>`;
@@ -675,4 +700,3 @@ class MyHeroElement extends HTMLElement {
 }
 
 window.customElements.define('my-hero-experience', MyHeroElement);
-export default { MyHeroElement }

@@ -43,7 +43,7 @@ const init = (configs)  => {
 };
 
 const view = (model) => {
-
+console.log('widget model ', model)
     return html`<div>
         <style>${style}</style>
         <h2> ${model.type} </h2>
@@ -88,7 +88,8 @@ const view = (model) => {
             </div>
             <div class="button">
                 <button aria-label="Extra Button"
-                    @on:click="${() => {}}">
+                    @on:click="${() => {}}"
+                    @on:keydown="${ model.navigationController ? (ev) => model.navigationController(ev) : ''}">
                     Extra Button
                 </button>
             </div>
