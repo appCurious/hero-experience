@@ -11,12 +11,12 @@ const keyboardNavigation = {
 
 // possibly extract out reusable code to a base element MyBaseElement extends HTMLElement
 // attaching shadow dom might be good candidate for base element
-export default class MyHeroExperience extends HTMLElement {
+class MyHeroElement extends HTMLElement {
 
     constructor (el) {
         console.log('what did you construct ', el)
         super();
-        console.log('created MyHeroExperience ');
+        console.log('created MyHeroElement ');
         this.attachShadow({mode: 'open'});
 
         const d = document.createElement('div');
@@ -85,7 +85,7 @@ export default class MyHeroExperience extends HTMLElement {
 
     static get observedAttributes () { return [ 'product-id', 'ec-json', 'hero-reference-selectors' ]; }
 
-    static registerCustomModule () { !customElements.get('my-hero-experience') ? window.customElements.define('my-hero-experience', MyHeroExperience) : ''; }
+    static registerCustomModule () { !customElements.get('my-hero-experience') ? window.customElements.define('my-hero-experience', MyHeroElement) : ''; }
 
 
     // private methods after public methods
@@ -231,7 +231,8 @@ export default class MyHeroExperience extends HTMLElement {
             canExpandWidth: false,
             canExpandHeight: false,
             heroReferenceSelectors: '',
-            heroReferenceSelectorArray: []
+            heroReferenceSelectorArray: [],
+            resetStyles: {} // should set these as a default if myHero is not found
             
         };
 
@@ -673,4 +674,5 @@ export default class MyHeroExperience extends HTMLElement {
     }
 }
 
-window.customElements.define('my-hero-experience', MyHeroExperience);
+window.customElements.define('my-hero-experience', MyHeroElement);
+export default { MyHeroElement }

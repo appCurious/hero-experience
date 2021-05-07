@@ -11,6 +11,13 @@ const style = `
         color: green;
     }
 
+    .button-container {
+        display: flex;
+        justify-content: space-between;
+        height: 60px;
+        width: 100%;
+    }
+
     .nav-button-container {
         display: flex;
         justify-content: space-between;
@@ -23,6 +30,8 @@ const style = `
         width: 80px;
         background: yellow;
     }
+
+
 
 `;
 
@@ -62,6 +71,26 @@ const view = (model) => {
                     </button>
                 </div>
                 ${mockTable(model.items)}
+            </div>
+        </div>
+        <div class="button-container">
+            <div class="button">
+                <button aria-label="Extra Button"
+                    @on:click="${() => {}}">
+                    Extra Button
+                </button>
+            </div>
+            <div class="button">
+                <button aria-label="Extra Button"
+                    @on:click="${() => {}}">
+                    Extra Button
+                </button>
+            </div>
+            <div class="button">
+                <button aria-label="Extra Button"
+                    @on:click="${() => {}}">
+                    Extra Button
+                </button>
             </div>
         </div>
         <div class="my-custom-element-col-2">

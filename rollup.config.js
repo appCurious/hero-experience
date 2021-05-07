@@ -56,7 +56,7 @@ export default {
     input: 'main.js',
     output: {
         file: './public/index.js',
-        name: 'MyHeroElement',
+        name: 'MyHeroExperience',
         format: 'cjs'
         // format: 'es'
         // format: 'umd'
